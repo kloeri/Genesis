@@ -1,0 +1,42 @@
+To do list for Genesis
+======================
+
+Fix autotools configuration
+- Make sure everything is installed in proper directories
+- Link genesis statically
+
+Documentation
+- Overall Genesis architecture
+- Netlink uevent interface
+- Other netlink interfaces
+
+Event sources
+- Add back netlink route events
+- Fix uevent regex crap
+- More event sources! application specific events would be fun and useful as well (think Apache, Maria DB, ..)
+- Could we do a general tail -f like event source?
+- "Normal" dependency based "event source" like baselayout
+
+Scripts
+- Allow multiple subscriptions (probably using bash arrays - bash scripts + GetMetadata needs to be fixed for this)
+- Write enough scripts that we can boot machines properly using Genesis
+
+General/core Genesis hacking
+- Better configuration/option handling
+- Implement logging
+- Implement a command channel for Genesis - we need to be able to adjust logging at runtime, stop and start event modules and so on
+- Rename /sbin/genesis to /sbin/genesis-handler and write a genesis client to communicate with genesis proper
+- Add error handling
+- Remove the pcre++ dependency and use glibc regex support instead
+- Fix bash env settings (PATH, shopts and whatever else is needed)
+- Change from pipes to socketpair and implement bidirectional communication
+  between main and worker threads
+
+Tests
+- There's currently no tests at all. This needs to be fixed
+
+Proof of concept scripts
+========================
+- Brute force SSH detection / prevention using firewall events
+- Live migration of KVM machines based on KVM RelayFS events
+- Timed, user VACUUM of .mozilla/firefox/*.default/*sqlite

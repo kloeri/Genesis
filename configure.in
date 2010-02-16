@@ -1,0 +1,13 @@
+dnl Process this file with autoconf to produce a configure script.
+
+AC_INIT(src/genesis.cc)
+AM_INIT_AUTOMAKE(genesis,0.0)
+AC_PROG_CXX
+AC_PROG_INSTALL
+AC_PROG_LIBTOOL
+AC_PROG_RANLIB
+AC_LANG(C++)
+AC_HAVE_LIBRARY(pthread)
+AC_CHECK_LIB(pcre++,pcre_compile)
+
+AC_OUTPUT(Makefile scripts/Makefile src/Makefile src/events/Makefile)
