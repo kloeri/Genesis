@@ -12,5 +12,5 @@ AC_CHECK_LIB([pthread],[main],[],[],[])ac_cv_lib_pthread=ac_cv_lib_pthread_main
 
 AC_CHECK_LIB(pcre++,pcre_compile)
 
-AC_CONFIG_FILES([Makefile scripts/Makefile src/Makefile src/events/Makefile])
+AC_CONFIG_FILES([Makefile scripts/Makefile src/Makefile src/actions/Makefile src/events/Makefile])
 AC_OUTPUT
