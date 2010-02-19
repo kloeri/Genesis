@@ -76,11 +76,11 @@ int main(int argc, char * argv[])
         pthread_create(&nl_thread[0], NULL, create_thread<GenesisFIFO>, notify);
     }
 
-//    if (ModulesConfiguration.get_option("netlink-uevent") == "yes")
-//    {
-//        pthread_create(&nl_thread[1], NULL, create_thread<NetlinkUevent>, NULL);
-//    }
-//
+    if (ModulesConfiguration.get_option("netlink-uevent") == "yes")
+    {
+        pthread_create(&nl_thread[1], NULL, create_thread<NetlinkUevent>, notify);
+    }
+
 //    if (ModulesConfiguration.get_option("netlink-route") == "yes")
 //    {
 //        pthread_create(&nl_thread[2], NULL, create_thread<NetlinkRoute>, NULL);
@@ -91,7 +91,7 @@ int main(int argc, char * argv[])
     {
         notify->wait();
         notify->getaction()->Execute();
-        notify->unlock();
+        notify->signal();
     }
 
     return 0;

@@ -238,19 +238,25 @@ void NetlinkUevent::ProcessEvent(std::string event)
         if (iter->match.search(event))
         {
             pcrepp::Pcre splitregex(";", "g");
-            genesis::RunBashFunction(iter->filename, iter->function, splitregex.split(event));
+            _notify->lock();
+            BashAction * action = new BashAction("run-function", iter->filename, iter->function, splitregex.split(event));
+            _notify->setaction(action);
+            _notify->signal();
+            _notify->wait();
+            _notify->unlock();
+
             matched = true;
             if (UEventConfiguration->get_option("log_matched_events") == "yes")
             {
                 std::string retval("matched netlink-uevent: " + event);
-                std::cout << retval << std::endl;
+//                std::cout << retval << std::endl;
             }
         }
     }
     if (!matched && UEventConfiguration->get_option("log_unmatched_events") == "yes")
     {
         std::string retval("unmatched netlink-uevent: " + event);
-        std::cout << retval << std::endl;
+//        std::cout << retval << std::endl;
     }
 }
 
