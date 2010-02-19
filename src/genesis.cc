@@ -20,11 +20,11 @@
 #include <cstring>
 #include <limits.h>
 #include <pcre++.h>
+#include <pthread.h>
 #include <string>
 #include <sys/mount.h>
 
-#include <pcre++.h>
-
+#include <eventnotifier.hh>
 #include <events/event.hh>
 #include <events/netlink-uevent.hh>
 #include <events/netlink-route.hh>
@@ -40,8 +40,8 @@ namespace
     template<class T>
     void *create_thread(void *arg)
     {
-        int* argp = static_cast<int*>(arg);
-        EventManager *event = new T(*argp);
+        EventNotifier* argp = static_cast<genesis::EventNotifier*>(arg);
+        __attribute__((unused)) EventManager *event = new T(argp);
 
         while (true)
         {
@@ -60,14 +60,6 @@ int main(int argc, char * argv[])
     genesis::Configuration ModulesConfiguration(SYSCONFDIR "config", "modules");
     genesis::Configuration GenesisConfiguration(SYSCONFDIR "config", "genesis");
 
-    // We use pipes for passing messages from event handlers to the main thread
-    int pipefds[2];
-    if (pipe(pipefds) == -1)
-    {
-        std::perror("pipe");
-        exit(-1);
-    }
-
     // Open log file
     std::ofstream Logfile;
     if (GenesisConfiguration.get_option("logging") == "file")
@@ -75,57 +67,31 @@ int main(int argc, char * argv[])
         Logfile.open(GenesisConfiguration.get_option("logfile").c_str());
     }
 
+    genesis::EventNotifier * notify = new genesis::EventNotifier();
+
     // Start netlink event handler threads
     pthread_t nl_thread[3];
     if (ModulesConfiguration.get_option("command") == "yes")
     {
-        pthread_create(&nl_thread[0], NULL, create_thread<GenesisFIFO>, &pipefds[1]);
+        pthread_create(&nl_thread[0], NULL, create_thread<GenesisFIFO>, notify);
     }
 
-    if (ModulesConfiguration.get_option("netlink-uevent") == "yes")
-    {
-        pthread_create(&nl_thread[1], NULL, create_thread<NetlinkUevent>, &pipefds[1]);
-    }
-
-    if (ModulesConfiguration.get_option("netlink-route") == "yes")
-    {
-        pthread_create(&nl_thread[2], NULL, create_thread<NetlinkRoute>, &pipefds[1]);
-    }
+//    if (ModulesConfiguration.get_option("netlink-uevent") == "yes")
+//    {
+//        pthread_create(&nl_thread[1], NULL, create_thread<NetlinkUevent>, NULL);
+//    }
+//
+//    if (ModulesConfiguration.get_option("netlink-route") == "yes")
+//    {
+//        pthread_create(&nl_thread[2], NULL, create_thread<NetlinkRoute>, NULL);
+//    }
 
     // Keep handling events infinitely
     while (true)
     {
-        // PIPE_BUF is the largest message size that the kernel guarantees atomic writes for
-        char buf[PIPE_BUF];
-        ssize_t len;
-        memset(&buf, 0, sizeof(buf));
-        len = read(pipefds[0], buf, PIPE_BUF);
-
-        std::stringstream events(buf);
-//        memset(buf, 0, PIPE_BUF);
-
-        while (!events.eof())
-        {
-            std::string eventstring;
-            std::getline(events, eventstring);
-
-            if (eventstring != "")
-            {
-                if (eventstring == "G_EVENTSOURCE=genesis;command=exit")
-                {
-                    exit(0);
-                }
-
-                if (GenesisConfiguration.get_option("logging") == "file")
-                {
-                    Logfile << eventstring << std::endl;
-                }
-                if (GenesisConfiguration.get_option("logging") == "console")
-                {
-                    std::cout << eventstring << std::endl;
-                }
-            }
-        }
+        notify->wait();
+        notify->getaction()->Execute();
+        notify->unlock();
     }
 
     return 0;

@@ -21,10 +21,11 @@
 #include <iostream>
 #include <sys/stat.h>
 #include <genesis-fifo.hh>
+#include <actions/genesis-action.hh>
 
-GenesisFIFO::GenesisFIFO(int &fd)
+GenesisFIFO::GenesisFIFO(genesis::EventNotifier * notify)
 {
-    pipe = fd;
+    _notify = notify;
 
     // Create control FIFO and make sure it has the right permissions
     int err = mkfifo("/dev/genesis", 0666);
@@ -46,11 +47,13 @@ void *GenesisFIFO::GetEvent()
         std::string event;
         controlstream >> event;
 
-        std::string return_val("G_EVENTSOURCE=genesis;");
-        return_val += "command=";
-        return_val += event;
-
-        write(pipe, return_val.c_str(), return_val.size()+1);
+        if (event == "exit")
+        {
+            GenesisAction * action = new GenesisAction("exit");
+            _notify->setaction(action);
+            _notify->lock();
+            _notify->signal();
+        }
     }
-    return NULL;
+    return 0;
 }

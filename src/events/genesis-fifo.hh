@@ -21,16 +21,17 @@
 #define SRC_GUARD_EVENTS_GENESIS_FIFO_HH 1
 
 #include <fstream>
+#include <eventnotifier.hh>
 #include <events/event.hh>
 
 class GenesisFIFO : public EventManager
 {
     private:
-        int pipe;
+        genesis::EventNotifier * _notify;
         std::ifstream controlstream;
 
     public:
-        GenesisFIFO(int &fd);
+        GenesisFIFO(genesis::EventNotifier * notify);
         ~GenesisFIFO();
         void *GetEvent();
 };

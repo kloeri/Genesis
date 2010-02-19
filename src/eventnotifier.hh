@@ -4,6 +4,7 @@
 #define SRC_GUARD_EVENTNOTIFIER_HH 1
 
 #include <pthread.h>
+#include <actions/action.hh>
 
 namespace genesis
 {
@@ -13,14 +14,17 @@ namespace genesis
             pthread_cond_t * _cond;
             pthread_mutex_t * _cond_lock;
             pthread_mutex_t * _lock;
+            Action * _action;
 
         public:
-            EventNotifier() : _cond(new pthread_cond_t), _cond_lock(new pthread_mutex_t), _lock(new pthread_mutex_t) {}
+            EventNotifier();
             void lock();
             void unlock();
             void broadcast();
             void signal();
             void wait();
+            Action * getaction();
+            void setaction(Action * action);
     };
 }
 

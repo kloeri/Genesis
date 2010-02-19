@@ -1,4 +1,4 @@
-SUBDIRS = events
+SUBDIRS = actions events
 
 sbin_PROGRAMS = genesis
 genesis_SOURCES = \
@@ -9,7 +9,7 @@ genesis_SOURCES = \
 	serialize.cc serialize.hh \
 	utils.cc utils.hh
 
-LDADD = events/libevents.la
+LDADD = events/libevents.la actions/libaction.la
 
 AM_CPPFLAGS = -Werror -Wall \
 	-DSYSCONFDIR=\"${sysconfdir}/genesis/\" \
