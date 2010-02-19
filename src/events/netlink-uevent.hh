@@ -24,6 +24,7 @@
 #include <utility>
 #include <config.hh>
 #include <events/event.hh>
+#include <eventnotifier.hh>
 
 struct eventhandler
 {
@@ -39,7 +40,7 @@ class NetlinkUevent : public EventManager
         genesis::Configuration * UEventConfiguration;
         std::list<eventhandler> eventsubscriptions;
         int netlinksocket;
-        int pipe;
+        genesis::EventNotifier * _notify;
 
         void GenerateEvents();
         void EmitEvents();
@@ -47,7 +48,7 @@ class NetlinkUevent : public EventManager
         void SourceScripts(std::string path);
 
     public:
-        NetlinkUevent(int fd);
+        NetlinkUevent(genesis::EventNotifier * notify);
         ~NetlinkUevent();
         void ProcessEvent(std::string event);
         void * GetEvent();

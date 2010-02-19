@@ -7,7 +7,7 @@ do
     declare -r ${sub}
     for match in ${!sub};
     do
-        echo "${1}, ${sub/SUBSCRIPTIONS_/}, ${match}"
+        echo "${sub/SUBSCRIPTIONS_/}, ${match}"
     done
 done
 

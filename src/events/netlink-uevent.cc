@@ -37,6 +37,8 @@
 #include <bash.hh>
 #include <config.hh>
 #include <netlink-uevent.hh>
+#include <eventnotifier.hh>
+#include <actions/bash-action.hh>
 
 namespace
 {
@@ -122,10 +124,9 @@ void NetlinkUevent::EmitEvents()
 //
 // Open sockets for all supported netlink protocols
 //
-NetlinkUevent::NetlinkUevent(int fd)
+NetlinkUevent::NetlinkUevent(genesis::EventNotifier * notify)
 {
-    pipe = fd;
-
+    _notify = notify;
     std::map<std::string, std::string> defaultconfig;
     defaultconfig["coldplug"] = "no";
     defaultconfig["log_matched_events"] = "no";
@@ -154,19 +155,25 @@ void NetlinkUevent::SourceScripts(std::string path)
         {
             std::string scriptfile(SYSCONFDIR "netlink-uevent/");
             scriptfile += eps[cnt]->d_name;
-            std::stringstream envvars(genesis::GetMetadata(scriptfile));
+
+            BashAction * action = new BashAction("get-metadata", scriptfile);
+            _notify->lock();
+            _notify->setaction(action);
+            _notify->signal();
+            _notify->wait();
+            _notify->unlock();
+
+            std::stringstream envvars(_notify->getaction()->GetResult());
             while (envvars.good())
             {
                 std::string line;
                 std::getline(envvars, line);
                 if (line != "")
                 {
-                    int firstdelimiter = line.find(", ");
-                    int seconddelimiter = line.find(", ", firstdelimiter + 2);
-                    std::string file(line.substr(0, firstdelimiter));
-                    std::string function(line.substr(firstdelimiter + 2, seconddelimiter - firstdelimiter - 2));
-                    std::string match(line.substr(seconddelimiter + 2));
-                    eventsubscriptions.push_back(eventhandler(file, function, pcrepp::Pcre(match)));
+                    int delimiter = line.find(", ");
+                    std::string function(line.substr(0, delimiter));
+                    std::string match(line.substr(delimiter + 2, line.size()));
+                    eventsubscriptions.push_back(eventhandler(scriptfile, function, pcrepp::Pcre(match)));
                 }
             }
         }
@@ -236,14 +243,14 @@ void NetlinkUevent::ProcessEvent(std::string event)
             if (UEventConfiguration->get_option("log_matched_events") == "yes")
             {
                 std::string retval("matched netlink-uevent: " + event);
-                write(pipe, retval.c_str(), retval.length() + 1);
+                std::cout << retval << std::endl;
             }
         }
     }
     if (!matched && UEventConfiguration->get_option("log_unmatched_events") == "yes")
     {
         std::string retval("unmatched netlink-uevent: " + event);
-        write(pipe, retval.c_str(), retval.length() + 1);
+        std::cout << retval << std::endl;
     }
 }
 
