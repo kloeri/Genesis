@@ -29,8 +29,6 @@ General/core Genesis hacking
 - Add error handling
 - Remove the pcre++ dependency and replace all the regex stuff with proper parsing
 - Fix bash env settings (PATH, shopts and whatever else is needed)
-- Change from pipes to socketpair and implement bidirectional communication
-  between main and worker threads or condition variables
 - Go through the code and cleanup/fix all the small things that makes things explode
 
 Tests
