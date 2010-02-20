@@ -1,6 +1,6 @@
 noinst_LTLIBRARIES = libevents.la
 libevents_la_SOURCES = \
-	events.hh \
+	event.hh \
 	netlink-uevent.cc netlink-uevent.hh \
 	netlink-route.cc netlink-route.hh \
 	genesis-fifo.cc genesis-fifo.hh
