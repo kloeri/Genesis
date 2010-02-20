@@ -12,9 +12,16 @@ class GenesisAction : public Action
         std::string command;
 
     public:
+        // Construct Action object
         GenesisAction(std::string cmd) : command(cmd) {}
+
+        // Perform the action
         void Execute();
+
+        // Get result from the action
         std::string GetResult();
+
+        // Data about the action for logging purposes
         std::string Identity();
 };
 

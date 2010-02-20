@@ -23,14 +23,6 @@
 #include <list>
 #include <string>
 
-//class Serialize {
-//    private:
-//
-//    public:
-//        std::string serialize(std::list<std::string> items);
-//        std::list<std::string> unserialize(std::string items);
-//};
-
 std::string serialize(std::list<std::string> items);
 std::list<std::string> unserialize(std::string items);
 

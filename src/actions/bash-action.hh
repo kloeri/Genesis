@@ -16,12 +16,19 @@ class BashAction : public Action
         std::string _result;
 
     public:
+        // Construct Action object
         BashAction(std::string command, std::string script, std::string function, std::vector<std::string> env)
             : _command(command), _script(script), _function(function), _env(env) {}
         BashAction(std::string command, std::string script)
             : _command(command), _script(script) {}
+
+        // Perform the action
         void Execute();
+
+        // Return the result of the action
         std::string GetResult();
+
+        // Return information on the action (filename, function, ..) for logging purposes
         std::string Identity();
 };
 

@@ -18,12 +18,26 @@ namespace genesis
 
         public:
             EventNotifier();
+
+            // Lock EventNotifier object using a mutex
             void lock();
+
+            // Unlock EventNotifier object
             void unlock();
+
+            // Signal all threads waiting on the condition variable
             void broadcast();
+
+            // Signal one thread waiting on the condition variable
             void signal();
+
+            // Wait for signal
             void wait();
+
+            // Returns a pointer to given Action object of the current event
             Action * getaction();
+
+            // Sets an Action for the current event
             void setaction(Action * action);
     };
 }

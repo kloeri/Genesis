@@ -42,15 +42,27 @@ class NetlinkUevent : public EventManager
         int netlinksocket;
         genesis::EventNotifier * _notify;
 
+        // Generate a list of coldplug events
         void GenerateEvents();
+
+        // Emit coldplug events
         void EmitEvents();
+
+        // Actual method responsible for the netlink uevent socket setup
         void * OpenSocket(int domain, int type, int protocol, int multicastgroup);
+
+        // Iterates over netlink-uevent scripts and gathers SUBSCRIPTION_* metadata
         void SourceScripts(std::string path);
 
     public:
+        // Sets up default configuration, does coldplugging if wanted and sets up the netlink uevent socket
         NetlinkUevent(genesis::EventNotifier * notify);
         ~NetlinkUevent();
+
+        // Handles raw events, matching them to subscriptions and sending Actions to genesis proper as needed
         void ProcessEvent(std::string event);
+
+        // Listens for netlink uevent messages and sends raw events to ProcessEvent
         void * GetEvent();
 };
 

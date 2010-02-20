@@ -25,9 +25,13 @@
 
 namespace genesis
 {
-    char **charptrarray(std::vector<std::string> env);
-    std::string GetMetadata(std::string file);
-    void RunBashFunction(std::string file, std::string function, std::vector<std::string> envvars);
+    char **charptrarray(const std::vector<std::string> & env);
+
+    // Sources file and returns SUBSCRIPTION_* variables from it
+    std::string GetMetadata(const std::string & file);
+
+    // Runs specified function with predetermined environment
+    void RunBashFunction(const std::string & file, const std::string & function, const std::vector<std::string> & envvars);
 }
 
 #endif

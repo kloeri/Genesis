@@ -31,8 +31,11 @@ class GenesisFIFO : public EventManager
         std::ifstream controlstream;
 
     public:
+        // Sets up the /dev/genesis fifo / command channel
         GenesisFIFO(genesis::EventNotifier * notify);
         ~GenesisFIFO();
+
+        // Listens for data on /dev/genesis fifo and sends Actions to genesis proper
         void *GetEvent();
 };
 

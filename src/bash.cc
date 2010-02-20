@@ -26,7 +26,7 @@
 
 namespace genesis
 {
-    char ** charptrarray(std::vector<std::string> env)
+    char ** charptrarray(const std::vector<std::string> & env)
     {
         // +1 as the array needs to be NULL terminated
         char ** cenv = new char * [env.size() + 1];
@@ -38,7 +38,7 @@ namespace genesis
         return cenv;
     }
 
-    std::string GetMetadata(std::string file)
+    std::string GetMetadata(const std::string & file)
     {
         int mystdin[2];
         int mystdout[2];
@@ -92,7 +92,7 @@ namespace genesis
         return std::string();
     }
 
-    void RunBashFunction(std::string file, std::string function, std::vector<std::string> envvars)
+    void RunBashFunction(const std::string & file, const std::string & function, const std::vector<std::string> & envvars)
     {
         int mystdin[2];
         int mystdout[2];
