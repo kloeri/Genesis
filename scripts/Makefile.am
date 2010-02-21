@@ -1,2 +1,2 @@
 libexecprogdir = $(libexecdir)/genesis
-libexecprog_SCRIPTS = *
+libexecprog_SCRIPTS = *.sh
