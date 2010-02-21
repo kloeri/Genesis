@@ -31,7 +31,7 @@ GenesisFIFO::GenesisFIFO(genesis::EventNotifier * notify)
     int err = mkfifo("/dev/genesis", 0666);
     err = chmod("/dev/genesis", 0666);
 
-    controlstream.open("/dev/genesis");
+    controlstream.open("/dev/genesis", std::ios_base::in | std::ios_base::out);
 }
 
 GenesisFIFO::~GenesisFIFO()
@@ -53,6 +53,8 @@ void *GenesisFIFO::GetEvent()
             _notify->setaction(action);
             _notify->lock();
             _notify->signal();
+            _notify->wait();
+            _notify->unlock();
         }
     }
     return 0;
