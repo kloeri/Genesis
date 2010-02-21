@@ -19,6 +19,7 @@
 
 #include <cstring>
 #include <limits.h>
+#include <map>
 #include <pcre++.h>
 #include <pthread.h>
 #include <string>
@@ -52,6 +53,43 @@ namespace
     }
 }
 
+class EventListener
+{
+    private:
+        std::map<int, EventManager *> eventmanagers;
+
+    public:
+        void add_eventsource(EventManager * eventmanager);
+        void listen();
+};
+
+void EventListener::add_eventsource(EventManager * eventmanager)
+{
+    int fd = eventmanager->get_fd();
+    eventmanagers[fd] = eventmanager;
+}
+
+void EventListener::listen()
+{
+    int maxfd = 0;
+    fd_set readfds;
+    FD_ZERO(&readfds);
+
+    for (std::map<int, EventManager *>::iterator iter = eventmanagers.begin(); iter != eventmanagers.end(); ++iter)
+    {
+        FD_SET(iter->first, &readfds);
+        maxfd = iter->first > maxfd ? iter->first : maxfd;
+    }
+    select(maxfd + 1, &readfds, NULL, NULL, NULL);
+    for (std::map<int, EventManager *>::iterator iter = eventmanagers.begin(); iter != eventmanagers.end(); ++iter)
+    {
+        if FD_ISSET(iter->first, &readfds)
+        {
+            iter->second->GetEvent();
+        }
+    }
+}
+
 int main(int argc, char * argv[])
 {
     WelcomeBlurb();
@@ -69,30 +107,37 @@ int main(int argc, char * argv[])
 
     genesis::EventNotifier * notify = new genesis::EventNotifier();
 
-    // Start netlink event handler threads
-    pthread_t nl_thread[3];
-    if (ModulesConfiguration.get_option("command") == "yes")
-    {
-        pthread_create(&nl_thread[0], NULL, create_thread<GenesisFIFO>, notify);
-    }
-
-    if (ModulesConfiguration.get_option("netlink-uevent") == "yes")
-    {
-        pthread_create(&nl_thread[1], NULL, create_thread<NetlinkUevent>, notify);
-    }
-
-//    if (ModulesConfiguration.get_option("netlink-route") == "yes")
-//    {
-//        pthread_create(&nl_thread[2], NULL, create_thread<NetlinkRoute>, NULL);
-//    }
-
-    // Keep handling events infinitely
+    EventListener listener;
+    listener.add_eventsource(new GenesisFIFO(notify));
     while (true)
     {
-        notify->wait();
-        notify->getaction()->Execute();
-        notify->signal();
+        listener.listen();
     }
+
+//    // Start netlink event handler threads
+//    pthread_t nl_thread[3];
+//    if (ModulesConfiguration.get_option("command") == "yes")
+//    {
+//        pthread_create(&nl_thread[0], NULL, create_thread<GenesisFIFO>, notify);
+//    }
+//
+//    if (ModulesConfiguration.get_option("netlink-uevent") == "yes")
+//    {
+//        pthread_create(&nl_thread[1], NULL, create_thread<NetlinkUevent>, notify);
+//    }
+//
+////    if (ModulesConfiguration.get_option("netlink-route") == "yes")
+////    {
+////        pthread_create(&nl_thread[2], NULL, create_thread<NetlinkRoute>, NULL);
+////    }
+//
+//    // Keep handling events infinitely
+//    while (true)
+//    {
+//        notify->wait();
+//        notify->getaction()->Execute();
+//        notify->signal();
+//    }
 
     return 0;
 }

@@ -12,6 +12,7 @@ class EventManager
 
     public:
         virtual void *GetEvent() = 0;
+        virtual int get_fd() = 0;
         virtual ~EventManager() {}
 };
 

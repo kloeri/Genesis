@@ -19,7 +19,10 @@
 
 #include <fstream>
 #include <iostream>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
+#include <cstring>
 #include <genesis-fifo.hh>
 #include <actions/genesis-action.hh>
 
@@ -31,31 +34,29 @@ GenesisFIFO::GenesisFIFO(genesis::EventNotifier * notify)
     int err = mkfifo("/dev/genesis", 0666);
     err = chmod("/dev/genesis", 0666);
 
-    controlstream.open("/dev/genesis", std::ios_base::in | std::ios_base::out);
+    fd = open("/dev/genesis", O_RDWR);
 }
 
 GenesisFIFO::~GenesisFIFO()
 {
-    controlstream.close();
+    close(fd);
     unlink("/dev/genesis");
+}
+
+int GenesisFIFO::get_fd()
+{
+    return fd;
 }
 
 void *GenesisFIFO::GetEvent()
 {
-    if (!!controlstream)
+    char buf[200];
+    ssize_t len = read(fd, &buf, 200);
+    buf[len] = '\0';
+    if (strcmp(buf, "exit") == 0)
     {
-        std::string event;
-        controlstream >> event;
-
-        if (event == "exit")
-        {
-            GenesisAction * action = new GenesisAction("exit");
-            _notify->setaction(action);
-            _notify->lock();
-            _notify->signal();
-            _notify->wait();
-            _notify->unlock();
-        }
+        GenesisAction * action = new GenesisAction("exit");
+        action->Execute();
     }
     return 0;
 }
