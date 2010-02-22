@@ -26,14 +26,6 @@
 #include <events/event.hh>
 #include <eventnotifier.hh>
 
-struct eventhandler
-{
-    eventhandler(std::string fn, std::string f, pcrepp::Pcre m) : filename(fn), function(f), match(m) {}
-    std::string filename;
-    std::string function;
-    pcrepp::Pcre match;
-};
-
 class NetlinkUevent : public EventManager
 {
     private:

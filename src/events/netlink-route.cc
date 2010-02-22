@@ -22,6 +22,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <dirent.h>
 #include <iostream>
 #include <sstream>
 #include <sys/socket.h>
@@ -30,20 +31,72 @@
 #include <linux/rtnetlink.h>
 
 #include <netlink-route.hh>
+#include <eventnotifier.hh>
+#include <actions/bash-action.hh>
+
+namespace
+{
+//    std::list<std::string> events;
+
+    int SourceScriptsCallback(const struct dirent * entry)
+    {
+        if (strlen(entry->d_name) > 3)
+        {
+            if (std::strcmp(entry->d_name + std::strlen(entry->d_name) - 3, ".sh") == 0)
+            {
+                return 1;
+            }
+        }
+        return 0;
+    }
+}
 
 //
 // Open sockets for all supported netlink protocols
 //
-NetlinkRoute::NetlinkRoute(int fd)
+NetlinkRoute::NetlinkRoute(genesis::EventNotifier * notify)
 {
-    pipe = fd;
-
+    SourceScripts(SYSCONFDIR "netlink-route/");
     OpenSocket(PF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE, RTNLGRP_MAX);
+}
+
+void NetlinkRoute::SourceScripts(std::string path)
+{
+    struct dirent **eps;
+    int n = scandir(path.c_str(), &eps, SourceScriptsCallback, alphasort);
+    if (n >= 0)
+    {
+        for (int cnt = 0; cnt < n; ++cnt)
+        {
+            std::string scriptfile(SYSCONFDIR "netlink-route/");
+            scriptfile += eps[cnt]->d_name;
+
+            BashAction * action = new BashAction("get-metadata", scriptfile);
+            action->Execute();
+
+            std::stringstream envvars(action->GetResult());
+            while (envvars.good())
+            {
+                std::string line;
+                std::getline(envvars, line);
+                if (line != "")
+                {
+                    int delimiter = line.find(", ");
+                    std::string function(line.substr(0, delimiter));
+                    std::string match(line.substr(delimiter + 2, line.size()));
+                    eventsubscriptions.push_back(eventhandler(scriptfile, function, pcrepp::Pcre(match)));
+                }
+            }
+        }
+    }
+    else
+    {
+        std::cerr << "Couldn't open the directory" << std::endl;
+    }
 }
 
 //
 // Supported protocols are:
-// NETLINK_KOBJECT_UEVENT
 // NETLINK_ROUTE
 //
 void * NetlinkRoute::OpenSocket(int domain, int type, int protocol, int multicastgroup)
@@ -329,141 +382,146 @@ void NetlinkRoute::serialize_ndm_flags(std::ostringstream & event, int flags)
 
 void *NetlinkRoute::GetEvent()
 {
-    fd_set read_descriptors;
+    std::ostringstream event_strings;
+    char netlink_buffer[PIPE_BUF];
+    memset(netlink_buffer, 0, PIPE_BUF);
 
-    FD_ZERO(&read_descriptors);
-    FD_SET(netlinksocket, &read_descriptors);
+    struct msghdr msg;
+    struct iovec iov;
+    char cred_msg[CMSG_SPACE(20)];
 
-    if (select(netlinksocket + 1, &read_descriptors, NULL, NULL, NULL) == -1)
+    // Clear data structures
+    memset(&msg, 0, sizeof(struct msghdr));
+    memset(&iov, 0, sizeof(struct iovec));
+    memset(&cred_msg, 0, sizeof(cred_msg));
+
+    // Setup scatter-gather structure
+    iov.iov_base = &netlink_buffer;
+    iov.iov_len = sizeof(netlink_buffer);
+
+    // Setup message structure
+    msg.msg_iov = &iov;
+    msg.msg_iovlen = 1;
+    msg.msg_control = cred_msg;
+    msg.msg_controllen = sizeof(cred_msg);
+
+    size_t len = recvmsg(netlinksocket, &msg, 0);
+    struct cmsghdr * cmsg = CMSG_FIRSTHDR(&msg);
+    if (cmsg == NULL || cmsg->cmsg_type != SCM_CREDENTIALS)
+        return NULL;
+    struct ucred * cred = reinterpret_cast<ucred *> CMSG_DATA(cmsg);
+    if (cred->uid != 0)
+        return NULL;
+
+    for (struct nlmsghdr * netlink_header = (struct nlmsghdr *) netlink_buffer; NLMSG_OK(netlink_header, len); netlink_header = NLMSG_NEXT(netlink_header, len))
     {
-        std::perror("select");
-        pthread_exit(reinterpret_cast<void *>(-1));
-    }
-
-    if (FD_ISSET(netlinksocket, &read_descriptors))
-    {
-        std::ostringstream event_strings;
-        char netlink_buffer[PIPE_BUF];
-        memset(netlink_buffer, 0, PIPE_BUF);
-
-        struct msghdr msg;
-        struct iovec iov;
-        char cred_msg[CMSG_SPACE(20)];
-
-        // Clear data structures
-        memset(&msg, 0, sizeof(struct msghdr));
-        memset(&iov, 0, sizeof(struct iovec));
-        memset(&cred_msg, 0, sizeof(cred_msg));
-
-        // Setup scatter-gather structure
-        iov.iov_base = &netlink_buffer;
-        iov.iov_len = sizeof(netlink_buffer);
-
-        // Setup message structure
-        msg.msg_iov = &iov;
-        msg.msg_iovlen = 1;
-        msg.msg_control = cred_msg;
-        msg.msg_controllen = sizeof(cred_msg);
-
-        size_t len = recvmsg(netlinksocket, &msg, 0);
-        struct cmsghdr * cmsg = CMSG_FIRSTHDR(&msg);
-        if (cmsg == NULL || cmsg->cmsg_type != SCM_CREDENTIALS)
-            return NULL;
-        struct ucred * cred = reinterpret_cast<ucred *> CMSG_DATA(cmsg);
-        if (cred->uid != 0)
-            return NULL;
-
-        for (struct nlmsghdr * netlink_header = (struct nlmsghdr *) netlink_buffer; NLMSG_OK(netlink_header, len); netlink_header = NLMSG_NEXT(netlink_header, len))
+        switch(netlink_header->nlmsg_type)
         {
-            switch(netlink_header->nlmsg_type)
-            {
-                case NLMSG_DONE:
-                    break;
-                case NLMSG_ERROR:
-                    break;
+            case NLMSG_DONE:
+                break;
+            case NLMSG_ERROR:
+                break;
 
-                    // Link state
-                case RTM_NEWLINK:
-                    event_strings << "new_link";
-                    break;
-                case RTM_DELLINK:
-                    event_strings << "removed_link";
-                    break;
-                case RTM_SETLINK:
-                    event_strings << "set_link";
-                    break;
+                // Link state
+            case RTM_NEWLINK:
+                event_strings << "new_link";
+                break;
+            case RTM_DELLINK:
+                event_strings << "removed_link";
+                break;
+            case RTM_SETLINK:
+                event_strings << "set_link";
+                break;
 
-                    // IP address management
-                case RTM_NEWADDR:
-                    serialize_rtm_newaddr(event_strings, netlink_header);
-                    break;
-                case RTM_DELADDR:
-                    serialize_rtm_deladdr(event_strings, netlink_header);
-                    break;
+                // IP address management
+            case RTM_NEWADDR:
+                serialize_rtm_newaddr(event_strings, netlink_header);
+                break;
+            case RTM_DELADDR:
+                serialize_rtm_deladdr(event_strings, netlink_header);
+                break;
 
-                    // Route changes
-                case RTM_NEWROUTE:
-                    struct rtmsg * rtmsg_payload;
+                // Route changes
+            case RTM_NEWROUTE:
+                struct rtmsg * rtmsg_payload;
 
-                    event_strings << "new_route";
-                    rtmsg_payload = (struct rtmsg *) NLMSG_DATA(netlink_header);
-                    event_strings << ";G_ADDRESS_FAMILY=" << static_cast<int>(rtmsg_payload->rtm_family);
-                    event_strings << ";g_DESTINATION_LENGTH=" << static_cast<int>(rtmsg_payload->rtm_dst_len);
-                    event_strings << ";g_SOURCE_LENGTH=" << static_cast<int>(rtmsg_payload->rtm_src_len);
-                    event_strings << ";G_TOS_FILTER=" << static_cast<int>(rtmsg_payload->rtm_tos);
-                    event_strings << ";G_ROUTING_TABLE_ID=" << static_cast<int>(rtmsg_payload->rtm_table);
-                    serialize_rtm_table(event_strings, rtmsg_payload->rtm_table);
-                    event_strings << ";G_ROUTING_PROTOCOL=" << static_cast<int>(rtmsg_payload->rtm_protocol);
-                    serialize_rtm_protocol(event_strings, rtmsg_payload->rtm_protocol);
-                    event_strings << ";G_ROUTING_SCOPE=" << static_cast<int>(rtmsg_payload->rtm_scope);
-                    serialize_rtm_scope(event_strings, rtmsg_payload->rtm_scope);
-                    event_strings << ";G_ROUTING_TYPE=" << static_cast<int>(rtmsg_payload->rtm_type);
-                    serialize_rtm_type(event_strings, rtmsg_payload->rtm_type);
-                    serialize_rtm_flags(event_strings, rtmsg_payload->rtm_flags);
-                    break;
-                case RTM_DELROUTE:
-                    event_strings << "removed_route";
-                    rtmsg_payload = (struct rtmsg *) NLMSG_DATA(netlink_header);
-                    event_strings << ";G_ADDRESS_FAMILY=" << static_cast<int>(rtmsg_payload->rtm_family);
-                    event_strings << ";G_DESTINATION_LENGTH=" << static_cast<int>(rtmsg_payload->rtm_dst_len);
-                    event_strings << ";G_SOURCE_LENGTH=" << static_cast<int>(rtmsg_payload->rtm_src_len);
-                    event_strings << ";G_TOS_FILTER=" << static_cast<int>(rtmsg_payload->rtm_tos);
-                    event_strings << ";G_ROUTING_TABLE_ID=" << static_cast<int>(rtmsg_payload->rtm_table);
-                    event_strings << ";G_ROUTING_PROTOCOL=" << static_cast<int>(rtmsg_payload->rtm_protocol);
-                    event_strings << ";G_ROUTING_SCOPE=" << static_cast<int>(rtmsg_payload->rtm_scope);
-                    event_strings << ";G_ROUTING_TYPE=" << static_cast<int>(rtmsg_payload->rtm_type);
-                    event_strings << ";G_ROUTING_FLAGS=" << static_cast<int>(rtmsg_payload->rtm_flags);
-                    break;
+                event_strings << "new_route";
+                rtmsg_payload = (struct rtmsg *) NLMSG_DATA(netlink_header);
+                event_strings << ";G_ADDRESS_FAMILY=" << static_cast<int>(rtmsg_payload->rtm_family);
+                event_strings << ";g_DESTINATION_LENGTH=" << static_cast<int>(rtmsg_payload->rtm_dst_len);
+                event_strings << ";g_SOURCE_LENGTH=" << static_cast<int>(rtmsg_payload->rtm_src_len);
+                event_strings << ";G_TOS_FILTER=" << static_cast<int>(rtmsg_payload->rtm_tos);
+                event_strings << ";G_ROUTING_TABLE_ID=" << static_cast<int>(rtmsg_payload->rtm_table);
+                serialize_rtm_table(event_strings, rtmsg_payload->rtm_table);
+                event_strings << ";G_ROUTING_PROTOCOL=" << static_cast<int>(rtmsg_payload->rtm_protocol);
+                serialize_rtm_protocol(event_strings, rtmsg_payload->rtm_protocol);
+                event_strings << ";G_ROUTING_SCOPE=" << static_cast<int>(rtmsg_payload->rtm_scope);
+                serialize_rtm_scope(event_strings, rtmsg_payload->rtm_scope);
+                event_strings << ";G_ROUTING_TYPE=" << static_cast<int>(rtmsg_payload->rtm_type);
+                serialize_rtm_type(event_strings, rtmsg_payload->rtm_type);
+                serialize_rtm_flags(event_strings, rtmsg_payload->rtm_flags);
+                break;
+            case RTM_DELROUTE:
+                event_strings << "removed_route";
+                rtmsg_payload = (struct rtmsg *) NLMSG_DATA(netlink_header);
+                event_strings << ";G_ADDRESS_FAMILY=" << static_cast<int>(rtmsg_payload->rtm_family);
+                event_strings << ";G_DESTINATION_LENGTH=" << static_cast<int>(rtmsg_payload->rtm_dst_len);
+                event_strings << ";G_SOURCE_LENGTH=" << static_cast<int>(rtmsg_payload->rtm_src_len);
+                event_strings << ";G_TOS_FILTER=" << static_cast<int>(rtmsg_payload->rtm_tos);
+                event_strings << ";G_ROUTING_TABLE_ID=" << static_cast<int>(rtmsg_payload->rtm_table);
+                event_strings << ";G_ROUTING_PROTOCOL=" << static_cast<int>(rtmsg_payload->rtm_protocol);
+                event_strings << ";G_ROUTING_SCOPE=" << static_cast<int>(rtmsg_payload->rtm_scope);
+                event_strings << ";G_ROUTING_TYPE=" << static_cast<int>(rtmsg_payload->rtm_type);
+                event_strings << ";G_ROUTING_FLAGS=" << static_cast<int>(rtmsg_payload->rtm_flags);
+                break;
 
-                    // Neightborhood discovery (ARP)
-                case RTM_NEWNEIGH:
-                    event_strings << "G_EVENTTYPE=new_neighbor;";
-                    struct ndmsg * ndmsg_payload;
-                    ndmsg_payload = (struct ndmsg *) NLMSG_DATA(netlink_header);
-                    serialize_ndm_family(event_strings, ndmsg_payload->ndm_family);
-                    event_strings << ";G_INTERFACE=" << static_cast<int>(ndmsg_payload->ndm_ifindex);
-                    serialize_ndm_state(event_strings, ndmsg_payload->ndm_state);
-                    serialize_ndm_flags(event_strings, ndmsg_payload->ndm_flags);
-                    event_strings << ";G_TYPE=" << static_cast<int>(ndmsg_payload->ndm_type);
-                    break;
-                case RTM_DELNEIGH:
-                    event_strings << "G_EVENTTYPE=removed_neighbor;";
-                    ndmsg_payload = (struct ndmsg *) NLMSG_DATA(netlink_header);
-                    serialize_ndm_family(event_strings, ndmsg_payload->ndm_family);
-                    event_strings << ";G_INTERFACE=" << static_cast<int>(ndmsg_payload->ndm_ifindex);
-                    serialize_ndm_state(event_strings, ndmsg_payload->ndm_state);
-                    serialize_ndm_flags(event_strings, ndmsg_payload->ndm_flags);
-                    event_strings << ";G_TYPE=" << static_cast<int>(ndmsg_payload->ndm_type);
-                    break;
-                default:
-                    event_strings << ";unknown_netlink_event_received=" << netlink_header->nlmsg_type;
-                    break;
-            }
+                // Neightborhood discovery (ARP)
+            case RTM_NEWNEIGH:
+                event_strings << "G_EVENTTYPE=new_neighbor;";
+                struct ndmsg * ndmsg_payload;
+                ndmsg_payload = (struct ndmsg *) NLMSG_DATA(netlink_header);
+                serialize_ndm_family(event_strings, ndmsg_payload->ndm_family);
+                event_strings << ";G_INTERFACE=" << static_cast<int>(ndmsg_payload->ndm_ifindex);
+                serialize_ndm_state(event_strings, ndmsg_payload->ndm_state);
+                serialize_ndm_flags(event_strings, ndmsg_payload->ndm_flags);
+                event_strings << ";G_TYPE=" << static_cast<int>(ndmsg_payload->ndm_type);
+                break;
+            case RTM_DELNEIGH:
+                event_strings << "G_EVENTTYPE=removed_neighbor;";
+                ndmsg_payload = (struct ndmsg *) NLMSG_DATA(netlink_header);
+                serialize_ndm_family(event_strings, ndmsg_payload->ndm_family);
+                event_strings << ";G_INTERFACE=" << static_cast<int>(ndmsg_payload->ndm_ifindex);
+                serialize_ndm_state(event_strings, ndmsg_payload->ndm_state);
+                serialize_ndm_flags(event_strings, ndmsg_payload->ndm_flags);
+                event_strings << ";G_TYPE=" << static_cast<int>(ndmsg_payload->ndm_type);
+                break;
+            default:
+                event_strings << ";unknown_netlink_event_received=" << netlink_header->nlmsg_type;
+                break;
         }
-        event_strings << std::endl;
-        std::string return_val("G_EVENTSOURCE=route;");
-        return_val += event_strings.str();
-        write(pipe, return_val.c_str(), strlen(return_val.c_str()));
     }
+    event_strings << std::endl;
+    std::string return_val("G_EVENTSOURCE=route;");
+    return_val += event_strings.str();
+    ProcessEvent(return_val);
+
     return NULL;
+}
+
+void NetlinkRoute::ProcessEvent(std::string event)
+{
+    for (std::list<eventhandler>::iterator iter = eventsubscriptions.begin(); iter != eventsubscriptions.end(); ++iter)
+    {
+        if (iter->match.search(event))
+        {
+            pcrepp::Pcre splitregex(";", "g");
+            BashAction * action = new BashAction("run-function", iter->filename, iter->function, splitregex.split(event));
+            action->Execute();
+        }
+    }
+}
+
+int NetlinkRoute::get_fd()
+{
+    return netlinksocket;
 }

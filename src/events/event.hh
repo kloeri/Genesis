@@ -4,6 +4,15 @@
 #define SRC_GUARD_EVENTS_EVENT_HH 1
 
 #include <pthread.h>
+#include <pcre++.h>
+
+struct eventhandler
+{
+    eventhandler(std::string fn, std::string f, pcrepp::Pcre m) : filename(fn), function(f), match(m) {}
+    std::string filename;
+    std::string function;
+    pcrepp::Pcre match;
+};
 
 class EventManager
 {

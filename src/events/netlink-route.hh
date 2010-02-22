@@ -21,18 +21,22 @@
 #define EVENTS_GUARD_NETLINK_ROUTE_HH 1
 
 #include <list>
+#include <string>
 #include <utility>
 #include <sys/socket.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <events/event.hh>
+#include <eventnotifier.hh>
+#include <pcre++.h>
 
 class NetlinkRoute : public EventManager
 {
     private:
         int netlinksocket;
-        int pipe;
+        std::list<eventhandler> eventsubscriptions;
 
+        void SourceScripts(std::string path);
         void * OpenSocket(int domain, int type, int protocol, int multicastgroup);
         void serialize_rtm_newaddr(std::ostringstream & event, nlmsghdr * header);
         void serialize_rtm_deladdr(std::ostringstream & event, nlmsghdr * header);
@@ -48,9 +52,11 @@ class NetlinkRoute : public EventManager
         void serialize_ndm_flags(std::ostringstream & event, int flags);
 
     public:
-        NetlinkRoute(int fd);
+        NetlinkRoute(genesis::EventNotifier * notify);
         ~NetlinkRoute();
         void *GetEvent();
+        void ProcessEvent(std::string event);
+        int get_fd();
 };
 
 #endif

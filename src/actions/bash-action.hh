@@ -4,6 +4,7 @@
 #define SRC_GUARD_ACTIONS_BASH_ACTION_HH 1
 
 #include <string>
+#include <vector>
 #include <actions/action.hh>
 
 class BashAction : public Action
