@@ -21,7 +21,6 @@
 #include <limits.h>
 #include <map>
 #include <pcre++.h>
-#include <pthread.h>
 #include <string>
 #include <sys/mount.h>
 
@@ -36,19 +35,6 @@ namespace
 {
     using namespace genesis;
     const std::string GenesisVersion = "0.1alpha0";
-
-    template<class T>
-    void *create_thread(void *arg)
-    {
-        EventManager *event = new T();
-
-        while (true)
-        {
-            event->GetEvent();
-        }
-
-        return NULL;
-    }
 }
 
 class EventListener

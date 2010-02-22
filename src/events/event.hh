@@ -3,7 +3,6 @@
 #ifndef SRC_GUARD_EVENTS_EVENT_HH
 #define SRC_GUARD_EVENTS_EVENT_HH 1
 
-#include <pthread.h>
 #include <pcre++.h>
 
 struct eventhandler
@@ -16,9 +15,6 @@ struct eventhandler
 
 class EventManager
 {
-    pthread_cond_t main;
-    pthread_cond_t handler;
-
     public:
         virtual void *GetEvent() = 0;
         virtual int get_fd() = 0;

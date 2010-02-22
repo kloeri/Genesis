@@ -15,10 +15,6 @@ void BashAction::Execute()
     {
         genesis::RunBashFunction(_script, _function, _env);
     }
-    if (_command == "print-filename")
-    {
-        std::cout << "filename: " << _script << std::endl;
-    }
 }
 
 std::string BashAction::GetResult()

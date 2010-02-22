@@ -190,7 +190,7 @@ void * NetlinkUevent::OpenSocket(int domain, int type, int protocol, int multica
     if ((netlinksocket = socket(domain, type, protocol)) == -1)
     {
         std::perror("socket");
-        pthread_exit((void *) -1);
+        return 0;
     }
 
     memset(&source_address, 0, sizeof(source_address));
@@ -200,14 +200,14 @@ void * NetlinkUevent::OpenSocket(int domain, int type, int protocol, int multica
     if (bind(netlinksocket, (struct sockaddr *) &source_address, sizeof(struct sockaddr_nl)) == -1)
     {
         std::perror("bind");
-        pthread_exit((void *) -1);
+        return 0;
     }
 
     int on = 1;
     if (setsockopt(netlinksocket, SOL_SOCKET, SO_PASSCRED, &on, sizeof(on)) == -1)
     {
         std::perror("setsockopt");
-        pthread_exit((void *) -1);
+        return 0;
     }
     return NULL;
 }

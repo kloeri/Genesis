@@ -8,7 +8,6 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 LT_INIT
 AC_LANG(C++)
-AC_CHECK_LIB([pthread],[main],[],[],[])ac_cv_lib_pthread=ac_cv_lib_pthread_main
 
 AC_CHECK_LIB(pcre++,pcre_compile)
 
