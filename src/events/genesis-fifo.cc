@@ -26,10 +26,8 @@
 #include <genesis-fifo.hh>
 #include <actions/genesis-action.hh>
 
-GenesisFIFO::GenesisFIFO(genesis::EventNotifier * notify)
+GenesisFIFO::GenesisFIFO()
 {
-    _notify = notify;
-
     // Create control FIFO and make sure it has the right permissions
     int err = mkfifo("/dev/genesis", 0666);
     err = chmod("/dev/genesis", 0666);

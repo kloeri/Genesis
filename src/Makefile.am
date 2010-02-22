@@ -4,7 +4,6 @@ sbin_PROGRAMS = genesis
 genesis_SOURCES = \
 	bash.cc bash.hh \
 	config.cc config.hh \
-	eventnotifier.cc eventnotifier.hh \
 	genesis.cc \
 	serialize.cc serialize.hh \
 	utils.cc utils.hh

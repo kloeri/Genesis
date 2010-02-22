@@ -31,7 +31,6 @@
 #include <linux/rtnetlink.h>
 
 #include <netlink-route.hh>
-#include <eventnotifier.hh>
 #include <actions/bash-action.hh>
 
 namespace
@@ -54,7 +53,7 @@ namespace
 //
 // Open sockets for all supported netlink protocols
 //
-NetlinkRoute::NetlinkRoute(genesis::EventNotifier * notify)
+NetlinkRoute::NetlinkRoute()
 {
     SourceScripts(SYSCONFDIR "netlink-route/");
     OpenSocket(PF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE, RTNLGRP_MAX);

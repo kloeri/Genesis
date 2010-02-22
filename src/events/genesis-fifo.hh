@@ -21,18 +21,16 @@
 #define SRC_GUARD_EVENTS_GENESIS_FIFO_HH 1
 
 #include <fstream>
-#include <eventnotifier.hh>
 #include <events/event.hh>
 
 class GenesisFIFO : public EventManager
 {
     private:
-        genesis::EventNotifier * _notify;
         int fd;
 
     public:
         // Sets up the /dev/genesis fifo / command channel
-        GenesisFIFO(genesis::EventNotifier * notify);
+        GenesisFIFO();
         ~GenesisFIFO();
 
         // Listens for data on /dev/genesis fifo and sends Actions to genesis proper

@@ -25,7 +25,6 @@
 #include <string>
 #include <sys/mount.h>
 
-#include <eventnotifier.hh>
 #include <events/event.hh>
 #include <events/netlink-uevent.hh>
 #include <events/netlink-route.hh>
@@ -41,8 +40,7 @@ namespace
     template<class T>
     void *create_thread(void *arg)
     {
-        EventNotifier* argp = static_cast<genesis::EventNotifier*>(arg);
-        __attribute__((unused)) EventManager *event = new T(argp);
+        EventManager *event = new T();
 
         while (true)
         {
@@ -105,41 +103,14 @@ int main(int argc, char * argv[])
         Logfile.open(GenesisConfiguration.get_option("logfile").c_str());
     }
 
-    genesis::EventNotifier * notify = new genesis::EventNotifier();
-
     EventListener listener;
-    listener.add_eventsource(new GenesisFIFO(notify));
-    listener.add_eventsource(new NetlinkUevent(notify));
-    listener.add_eventsource(new NetlinkRoute(notify));
+    listener.add_eventsource(new GenesisFIFO());
+    listener.add_eventsource(new NetlinkUevent());
+    listener.add_eventsource(new NetlinkRoute());
     while (true)
     {
         listener.listen();
     }
-
-//    // Start netlink event handler threads
-//    pthread_t nl_thread[3];
-//    if (ModulesConfiguration.get_option("command") == "yes")
-//    {
-//        pthread_create(&nl_thread[0], NULL, create_thread<GenesisFIFO>, notify);
-//    }
-//
-//    if (ModulesConfiguration.get_option("netlink-uevent") == "yes")
-//    {
-//        pthread_create(&nl_thread[1], NULL, create_thread<NetlinkUevent>, notify);
-//    }
-//
-////    if (ModulesConfiguration.get_option("netlink-route") == "yes")
-////    {
-////        pthread_create(&nl_thread[2], NULL, create_thread<NetlinkRoute>, NULL);
-////    }
-//
-//    // Keep handling events infinitely
-//    while (true)
-//    {
-//        notify->wait();
-//        notify->getaction()->Execute();
-//        notify->signal();
-//    }
 
     return 0;
 }

@@ -24,7 +24,6 @@
 #include <utility>
 #include <config.hh>
 #include <events/event.hh>
-#include <eventnotifier.hh>
 
 class NetlinkUevent : public EventManager
 {
@@ -32,7 +31,6 @@ class NetlinkUevent : public EventManager
         genesis::Configuration * UEventConfiguration;
         std::list<eventhandler> eventsubscriptions;
         int netlinksocket;
-        genesis::EventNotifier * _notify;
 
         // Generate a list of coldplug events
         void GenerateEvents();
@@ -48,7 +46,7 @@ class NetlinkUevent : public EventManager
 
     public:
         // Sets up default configuration, does coldplugging if wanted and sets up the netlink uevent socket
-        NetlinkUevent(genesis::EventNotifier * notify);
+        NetlinkUevent();
         ~NetlinkUevent();
 
         // Handles raw events, matching them to subscriptions and sending Actions to genesis proper as needed

@@ -37,7 +37,6 @@
 #include <bash.hh>
 #include <config.hh>
 #include <netlink-uevent.hh>
-#include <eventnotifier.hh>
 #include <actions/bash-action.hh>
 
 namespace
@@ -124,9 +123,8 @@ void NetlinkUevent::EmitEvents()
 //
 // Open sockets for all supported netlink protocols
 //
-NetlinkUevent::NetlinkUevent(genesis::EventNotifier * notify)
+NetlinkUevent::NetlinkUevent()
 {
-    _notify = notify;
     std::map<std::string, std::string> defaultconfig;
     defaultconfig["coldplug"] = "no";
     defaultconfig["log_matched_events"] = "no";

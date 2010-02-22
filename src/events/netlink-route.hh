@@ -27,7 +27,6 @@
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <events/event.hh>
-#include <eventnotifier.hh>
 #include <pcre++.h>
 
 class NetlinkRoute : public EventManager
@@ -52,7 +51,7 @@ class NetlinkRoute : public EventManager
         void serialize_ndm_flags(std::ostringstream & event, int flags);
 
     public:
-        NetlinkRoute(genesis::EventNotifier * notify);
+        NetlinkRoute();
         ~NetlinkRoute();
         void *GetEvent();
         void ProcessEvent(std::string event);
