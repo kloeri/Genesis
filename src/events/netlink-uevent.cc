@@ -134,7 +134,7 @@ NetlinkUevent::NetlinkUevent(genesis::EventNotifier * notify)
     defaultconfig["coldplug_mount_sysfs"] = "yes";
 
     UEventConfiguration = new genesis::Configuration(SYSCONFDIR "config", "netlink-uevent", defaultconfig);
-    SourceScripts(SYSCONFDIR "netlink-uevent");
+    SourceScripts(SYSCONFDIR "netlink-uevent/");
 
     if (UEventConfiguration->get_option("coldplug") == "yes")
     {
@@ -157,13 +157,9 @@ void NetlinkUevent::SourceScripts(std::string path)
             scriptfile += eps[cnt]->d_name;
 
             BashAction * action = new BashAction("get-metadata", scriptfile);
-            _notify->lock();
-            _notify->setaction(action);
-            _notify->signal();
-            _notify->wait();
-            _notify->unlock();
+            action->Execute();
 
-            std::stringstream envvars(_notify->getaction()->GetResult());
+            std::stringstream envvars(action->GetResult());
             while (envvars.good())
             {
                 std::string line;
@@ -238,12 +234,8 @@ void NetlinkUevent::ProcessEvent(std::string event)
         if (iter->match.search(event))
         {
             pcrepp::Pcre splitregex(";", "g");
-            _notify->lock();
             BashAction * action = new BashAction("run-function", iter->filename, iter->function, splitregex.split(event));
-            _notify->setaction(action);
-            _notify->signal();
-            _notify->wait();
-            _notify->unlock();
+            action->Execute();
 
             matched = true;
             if (UEventConfiguration->get_option("log_matched_events") == "yes")
@@ -262,54 +254,45 @@ void NetlinkUevent::ProcessEvent(std::string event)
 
 void * NetlinkUevent::GetEvent()
 {
-    fd_set read_descriptors;
+    char netlink_buffer[PIPE_BUF];
+    memset(netlink_buffer, 0, PIPE_BUF);
 
-    FD_ZERO(&read_descriptors);
-    FD_SET(netlinksocket, &read_descriptors);
+    struct msghdr msg;
+    struct iovec iov;
+    char cred_msg[CMSG_SPACE(20)];
 
-    if (select(netlinksocket + 1, &read_descriptors, NULL, NULL, NULL) == -1)
-    {
-        std::perror("select");
-        pthread_exit((void *) -1);
-    }
+    // Clear data structures
+    memset(&msg, 0, sizeof(struct msghdr));
+    memset(&iov, 0, sizeof(struct iovec));
+    memset(&cred_msg, 0, sizeof(cred_msg));
 
-    if (FD_ISSET(netlinksocket, &read_descriptors))
-    {
-        char netlink_buffer[PIPE_BUF];
-        memset(netlink_buffer, 0, PIPE_BUF);
+    // Setup scatter-gather structure
+    iov.iov_base = &netlink_buffer;
+    iov.iov_len = sizeof(netlink_buffer);
 
-        struct msghdr msg;
-        struct iovec iov;
-        char cred_msg[CMSG_SPACE(20)];
+    // Setup message structure
+    msg.msg_iov = &iov;
+    msg.msg_iovlen = 1;
+    msg.msg_control = cred_msg;
+    msg.msg_controllen = sizeof(cred_msg);
 
-        // Clear data structures
-        memset(&msg, 0, sizeof(struct msghdr));
-        memset(&iov, 0, sizeof(struct iovec));
-        memset(&cred_msg, 0, sizeof(cred_msg));
+    recvmsg(netlinksocket, &msg, 0);
+    struct cmsghdr * cmsg = CMSG_FIRSTHDR(&msg);
+    if (cmsg == NULL || cmsg->cmsg_type != SCM_CREDENTIALS)
+        return NULL;
+    struct ucred * cred = reinterpret_cast<ucred *> CMSG_DATA(cmsg);
+    if (cred->uid != 0)
+        return NULL;
 
-        // Setup scatter-gather structure
-        iov.iov_base = &netlink_buffer;
-        iov.iov_len = sizeof(netlink_buffer);
+    std::stringstream event_strings(netlink_buffer);
+    std::string event_envvars;
+    std::getline(event_strings, event_envvars);
 
-        // Setup message structure
-        msg.msg_iov = &iov;
-        msg.msg_iovlen = 1;
-        msg.msg_control = cred_msg;
-        msg.msg_controllen = sizeof(cred_msg);
-
-        recvmsg(netlinksocket, &msg, 0);
-        struct cmsghdr * cmsg = CMSG_FIRSTHDR(&msg);
-        if (cmsg == NULL || cmsg->cmsg_type != SCM_CREDENTIALS)
-            return NULL;
-        struct ucred * cred = reinterpret_cast<ucred *> CMSG_DATA(cmsg);
-        if (cred->uid != 0)
-            return NULL;
-
-        std::stringstream event_strings(netlink_buffer);
-        std::string event_envvars;
-        std::getline(event_strings, event_envvars);
-
-        ProcessEvent(event_envvars);
-    }
+    ProcessEvent(event_envvars);
     return NULL;
+}
+
+int NetlinkUevent::get_fd()
+{
+    return netlinksocket;
 }

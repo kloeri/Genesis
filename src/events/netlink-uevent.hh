@@ -64,6 +64,8 @@ class NetlinkUevent : public EventManager
 
         // Listens for netlink uevent messages and sends raw events to ProcessEvent
         void * GetEvent();
+
+        int get_fd();
 };
 
 #endif

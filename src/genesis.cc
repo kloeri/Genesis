@@ -109,6 +109,7 @@ int main(int argc, char * argv[])
 
     EventListener listener;
     listener.add_eventsource(new GenesisFIFO(notify));
+    listener.add_eventsource(new NetlinkUevent(notify));
     while (true)
     {
         listener.listen();
