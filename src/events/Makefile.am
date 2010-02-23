@@ -6,3 +6,4 @@ libevents_la_SOURCES = \
 	genesis-fifo.cc genesis-fifo.hh
 
 AM_CPPFLAGS = -Werror -Wall -I${top_srcdir}/src -DSYSCONFDIR=\"${sysconfdir}/genesis/\"
+AM_CXXFLAGS = $(PCREPLUSPLUS_CFLAGS)
