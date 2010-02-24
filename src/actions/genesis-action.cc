@@ -10,7 +10,6 @@ void GenesisAction::Execute()
     if (command == "exit")
     {
         std::cout << "Genesis received exit command." << std::endl;
-        sleep(1);
         exit(0);
     }
 }
