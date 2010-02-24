@@ -71,8 +71,10 @@ void EventListener::listen()
         if FD_ISSET(iter->first, &readfds)
         {
             Action * action = iter->second->GetEvent();
-            std::cout << "identity: " << action->Identity() << std::endl;
-            action->Execute();
+            if (action != NULL)
+            {
+                action->Execute();
+            }
         }
     }
 }
