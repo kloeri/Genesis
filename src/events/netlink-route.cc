@@ -379,7 +379,7 @@ void NetlinkRoute::serialize_ndm_flags(std::ostringstream & event, int flags)
         event << "ipv6_router";
 }
 
-void *NetlinkRoute::GetEvent()
+Action *NetlinkRoute::GetEvent()
 {
     std::ostringstream event_strings;
     char netlink_buffer[PIPE_BUF];
@@ -502,22 +502,20 @@ void *NetlinkRoute::GetEvent()
     event_strings << std::endl;
     std::string return_val("G_EVENTSOURCE=route;");
     return_val += event_strings.str();
-    ProcessEvent(return_val);
-
-    return NULL;
+    return ProcessEvent(return_val);
 }
 
-void NetlinkRoute::ProcessEvent(std::string event)
+Action * NetlinkRoute::ProcessEvent(std::string event)
 {
     for (std::list<eventhandler>::iterator iter = eventsubscriptions.begin(); iter != eventsubscriptions.end(); ++iter)
     {
         if (iter->match.search(event))
         {
             pcrepp::Pcre splitregex(";", "g");
-            BashAction * action = new BashAction("run-function", iter->filename, iter->function, splitregex.split(event));
-            action->Execute();
+            return new BashAction("run-function", iter->filename, iter->function, splitregex.split(event));
         }
     }
+    return 0;
 }
 
 int NetlinkRoute::get_fd()

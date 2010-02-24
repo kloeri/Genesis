@@ -46,15 +46,14 @@ int GenesisFIFO::get_fd()
     return fd;
 }
 
-void *GenesisFIFO::GetEvent()
+Action * GenesisFIFO::GetEvent()
 {
     char buf[200];
     ssize_t len = read(fd, &buf, 200);
     buf[len] = '\0';
     if (strcmp(buf, "exit") == 0)
     {
-        GenesisAction * action = new GenesisAction("exit");
-        action->Execute();
+        return new GenesisAction("exit");
     }
     return 0;
 }

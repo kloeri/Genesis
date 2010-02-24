@@ -24,6 +24,7 @@
 #include <string>
 #include <sys/mount.h>
 
+#include <actions/action.hh>
 #include <events/event.hh>
 #include <events/netlink-uevent.hh>
 #include <events/netlink-route.hh>
@@ -69,7 +70,9 @@ void EventListener::listen()
     {
         if FD_ISSET(iter->first, &readfds)
         {
-            iter->second->GetEvent();
+            Action * action = iter->second->GetEvent();
+            std::cout << "identity: " << action->Identity() << std::endl;
+            action->Execute();
         }
     }
 }

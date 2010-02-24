@@ -34,7 +34,7 @@ class GenesisFIFO : public EventManager
         ~GenesisFIFO();
 
         // Listens for data on /dev/genesis fifo and sends Actions to genesis proper
-        void *GetEvent();
+        Action * GetEvent();
         int get_fd();
 };
 

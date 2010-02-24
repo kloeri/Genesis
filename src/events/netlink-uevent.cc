@@ -116,7 +116,12 @@ void NetlinkUevent::EmitEvents()
 {
     for (std::list<std::string>::const_iterator iter = events.begin(); iter != events.end(); ++iter)
     {
-        ProcessEvent(*iter);
+        Action * action = ProcessEvent(*iter);
+        if (action != 0)
+        {
+            std::cout << "Executing event!" << std::endl;
+            action->Execute();
+        }
     }
 }
 
@@ -217,7 +222,7 @@ NetlinkUevent::~NetlinkUevent()
     close(netlinksocket);
 }
 
-void NetlinkUevent::ProcessEvent(std::string event)
+Action * NetlinkUevent::ProcessEvent(std::string event)
 {
     if (event.find("add@") != std::string::npos)
         event.replace(event.find("add@"), 4, "G_EVENTTYPE=newdevice;G_DEVICE=");
@@ -226,31 +231,18 @@ void NetlinkUevent::ProcessEvent(std::string event)
     if (event.find("change@") != std::string::npos)
         event.replace(event.find("change@"), 7, "G_EVENTTYPE=changedevice;G_DEVICE=");
 
-    bool matched = false;
     for (std::list<eventhandler>::iterator iter = eventsubscriptions.begin(); iter != eventsubscriptions.end(); ++iter)
     {
         if (iter->match.search(event))
         {
             pcrepp::Pcre splitregex(";", "g");
-            BashAction * action = new BashAction("run-function", iter->filename, iter->function, splitregex.split(event));
-            action->Execute();
-
-            matched = true;
-            if (UEventConfiguration->get_option("log_matched_events") == "yes")
-            {
-                std::string retval("matched netlink-uevent: " + event);
-//                std::cout << retval << std::endl;
-            }
+            return new BashAction("run-function", iter->filename, iter->function, splitregex.split(event));
         }
     }
-    if (!matched && UEventConfiguration->get_option("log_unmatched_events") == "yes")
-    {
-        std::string retval("unmatched netlink-uevent: " + event);
-//        std::cout << retval << std::endl;
-    }
+    return 0;
 }
 
-void * NetlinkUevent::GetEvent()
+Action * NetlinkUevent::GetEvent()
 {
     char netlink_buffer[PIPE_BUF];
     memset(netlink_buffer, 0, PIPE_BUF);
@@ -286,8 +278,7 @@ void * NetlinkUevent::GetEvent()
     std::string event_envvars;
     std::getline(event_strings, event_envvars);
 
-    ProcessEvent(event_envvars);
-    return NULL;
+    return ProcessEvent(event_envvars);
 }
 
 int NetlinkUevent::get_fd()

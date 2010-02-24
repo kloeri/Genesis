@@ -50,10 +50,10 @@ class NetlinkUevent : public EventManager
         ~NetlinkUevent();
 
         // Handles raw events, matching them to subscriptions and sending Actions to genesis proper as needed
-        void ProcessEvent(std::string event);
+        Action * ProcessEvent(std::string event);
 
         // Listens for netlink uevent messages and sends raw events to ProcessEvent
-        void * GetEvent();
+        Action * GetEvent();
 
         int get_fd();
 };
