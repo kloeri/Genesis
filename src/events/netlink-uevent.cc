@@ -101,7 +101,7 @@ void NetlinkUevent::GenerateEvents()
     }
 
     int retcode = 0;
-    retcode = nftw("/sys/dev/", GenerateEventsCallback, 1, FTW_ACTIONRETVAL);
+    retcode = nftw("/sys/class/", GenerateEventsCallback, 1, FTW_ACTIONRETVAL);
 
     if ((UEventConfiguration->get_option("coldplug") == "yes") && (UEventConfiguration->get_option("coldplug_mounts_sysfs") == "yes"))
     {
