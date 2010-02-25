@@ -56,6 +56,7 @@ class NetlinkUevent : public EventManager
         Action * GetEvent();
 
         int get_fd();
+        void new_event(std::string event);
 };
 
 #endif

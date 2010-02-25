@@ -57,3 +57,7 @@ Action * GenesisFIFO::GetEvent()
     }
     return 0;
 }
+
+void GenesisFIFO::new_event(std::string event)
+{
+}

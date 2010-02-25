@@ -20,6 +20,7 @@ class EventManager
         virtual Action * GetEvent() = 0;
         virtual int get_fd() = 0;
         virtual ~EventManager() {}
+        virtual void new_event(std::string) = 0;
 };
 
 #endif

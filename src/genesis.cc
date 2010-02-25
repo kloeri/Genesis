@@ -46,6 +46,7 @@ class EventListener
     public:
         void add_eventsource(EventManager * eventmanager);
         void listen();
+	void send_event(std::string event);
 };
 
 void EventListener::add_eventsource(EventManager * eventmanager)
@@ -74,8 +75,17 @@ void EventListener::listen()
             if (action != NULL)
             {
                 action->Execute();
+                send_event(action->Identity());
             }
         }
+    }
+}
+
+void EventListener::send_event(std::string event)
+{
+    for (std::map<int, EventManager *>::iterator iter = eventmanagers.begin(); iter != eventmanagers.end(); ++iter)
+    {
+        iter->second->new_event(event);
     }
 }
 
@@ -98,6 +108,8 @@ int main(int argc, char * argv[])
     listener.add_eventsource(new GenesisFIFO());
     listener.add_eventsource(new NetlinkUevent());
     listener.add_eventsource(new NetlinkRoute());
+    listener.send_event("genesis-initialising");
+    listener.send_event("genesis-started");
     while (true)
     {
         listener.listen();

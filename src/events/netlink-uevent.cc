@@ -119,7 +119,6 @@ void NetlinkUevent::EmitEvents()
         Action * action = ProcessEvent(*iter);
         if (action != 0)
         {
-            std::cout << "Executing event!" << std::endl;
             action->Execute();
         }
     }
@@ -285,3 +284,13 @@ int NetlinkUevent::get_fd()
 {
     return netlinksocket;
 }
+
+void NetlinkUevent::new_event(std::string event)
+{
+    Action * action = ProcessEvent(event);
+    if (action != NULL)
+    {
+        action->Execute();
+    }
+}
+

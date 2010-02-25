@@ -35,8 +35,6 @@
 
 namespace
 {
-//    std::list<std::string> events;
-
     int SourceScriptsCallback(const struct dirent * entry)
     {
         if (strlen(entry->d_name) > 3)
@@ -522,3 +520,8 @@ int NetlinkRoute::get_fd()
 {
     return netlinksocket;
 }
+
+void NetlinkRoute::new_event(std::string event)
+{
+}
+
