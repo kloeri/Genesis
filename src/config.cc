@@ -23,64 +23,61 @@
 
 #include <config.hh>
 
-namespace genesis
+Configuration::Configuration(std::string conffile, std::string sectionname)
 {
-    Configuration::Configuration(std::string conffile, std::string sectionname)
+    Construct(conffile, sectionname, std::map<std::string, std::string>());
+}
+
+Configuration::Configuration(std::string conffile, std::string sectionname, std::map<std::string, std::string> defconfig)
+{
+    Construct(conffile, sectionname, defconfig);
+}
+
+void Configuration::Construct(std::string conffile, std::string sectionname, std::map<std::string, std::string> defconfig)
+{
+    // Set default configuration
+    for (std::map<std::string,std::string>::iterator iter = defconfig.begin(); iter != defconfig.end(); ++iter)
     {
-        Construct(conffile, sectionname, std::map<std::string, std::string>());
+        options[iter->first] = iter->second;
     }
 
-    Configuration::Configuration(std::string conffile, std::string sectionname, std::map<std::string, std::string> defconfig)
+    std::ifstream config(conffile.c_str());
+    while (!config.eof())
     {
-        Construct(conffile, sectionname, defconfig);
-    }
+        std::string line;
+        std::getline(config, line);
 
-    void Configuration::Construct(std::string conffile, std::string sectionname, std::map<std::string, std::string> defconfig)
-    {
-        // Set default configuration
-        for (std::map<std::string,std::string>::iterator iter = defconfig.begin(); iter != defconfig.end(); ++iter)
+        // Remove comments
+        pcrepp::Pcre regex_comments("#.*");
+        line = regex_comments.replace(line, "");
+
+        if (section == sectionname)
         {
-            options[iter->first] = iter->second;
-        }
-
-        std::ifstream config(conffile.c_str());
-        while (!config.eof())
-        {
-            std::string line;
-            std::getline(config, line);
-
-            // Remove comments
-            pcrepp::Pcre regex_comments("#.*");
-            line = regex_comments.replace(line, "");
-
-            if (section == sectionname)
+            pcrepp::Pcre regex_module("[ \t]*\\[([a-zA-Z]+)\\][ \t]*");
+            regex_module.search(line);
+            if (regex_module.matches() > -1)
             {
-                pcrepp::Pcre regex_module("[ \t]*\\[([a-zA-Z]+)\\][ \t]*");
-                regex_module.search(line);
-                if (regex_module.matches() > -1)
-                {
-                    section = regex_module.get_match(0);
-                }
-
-                pcrepp::Pcre regex_keyvalue("[ \t]*([a-zA-Z_-]+)[ \t]*=[ \t]*([a-zA-Z0-9/._]+)[ \t]*");
-                regex_keyvalue.search(line);
-                if (regex_keyvalue.matches() > -1)
-                {
-                    options[regex_keyvalue.get_match(0)] = regex_keyvalue.get_match(1);
-                }
+                section = regex_module.get_match(0);
             }
-            else if (line[0] == '[')
+
+            pcrepp::Pcre regex_keyvalue("[ \t]*([a-zA-Z_-]+)[ \t]*=[ \t]*([a-zA-Z0-9/._]+)[ \t]*");
+            regex_keyvalue.search(line);
+            if (regex_keyvalue.matches() > -1)
             {
-                section = line.substr(1, line.size() - 2);
+                options[regex_keyvalue.get_match(0)] = regex_keyvalue.get_match(1);
             }
         }
-
-        section = sectionname;
+        else if (line[0] == '[')
+        {
+            section = line.substr(1, line.size() - 2);
+        }
     }
 
-    std::string Configuration::get_option(const std::string key) const
-    {
-        return options[key];
-    }
+    section = sectionname;
+}
+
+std::string Configuration::get_option(const std::string key) const
+{
+    return options[key];
 }
 

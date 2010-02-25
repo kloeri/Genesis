@@ -24,9 +24,6 @@
 #include <iostream>
 #include <string>
 
-namespace genesis
-{
-    void WelcomeBlurb();
-}
+void WelcomeBlurb();
 
 #endif

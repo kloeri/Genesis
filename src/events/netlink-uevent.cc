@@ -135,7 +135,7 @@ NetlinkUevent::NetlinkUevent()
     defaultconfig["log_unmatched_events"] = "yes";
     defaultconfig["coldplug_mount_sysfs"] = "yes";
 
-    UEventConfiguration = new genesis::Configuration(SYSCONFDIR "config", "netlink-uevent", defaultconfig);
+    UEventConfiguration = new Configuration(SYSCONFDIR "config", "netlink-uevent", defaultconfig);
     SourceScripts(SYSCONFDIR "netlink-uevent/");
 
     if (UEventConfiguration->get_option("coldplug") == "yes")

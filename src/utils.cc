@@ -22,10 +22,7 @@
 #include <string>
 #include <utils.hh>
 
-namespace genesis
+void WelcomeBlurb()
 {
-    void WelcomeBlurb()
-    {
-        std::cout << "Genesis (c) 2009 Bryan Østergaard <kloeri@exherbo.org>" << std::endl;
-    }
+    std::cout << "Genesis (c) 2009 Bryan Østergaard <kloeri@exherbo.org>" << std::endl;
 }

@@ -9,11 +9,11 @@ void BashAction::Execute()
 {
     if (_command == "get-metadata")
     {
-        _result = genesis::GetMetadata(_script);
+        _result = GetMetadata(_script);
     }
     if (_command == "run-function")
     {
-        genesis::RunBashFunction(_script, _function, _env);
+        RunBashFunction(_script, _function, _env);
     }
 }
 

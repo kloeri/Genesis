@@ -25,117 +25,114 @@
 #include <bash.hh>
 #include <logger.hh>
 
-namespace genesis
+char ** charptrarray(const std::vector<std::string> & env)
 {
-    char ** charptrarray(const std::vector<std::string> & env)
+    // +1 as the array needs to be NULL terminated
+    char ** cenv = new char * [env.size() + 1];
+
+    for (unsigned int i=0; i<env.size(); ++i)
+        cenv[i] = const_cast<char *> (env.at(i).c_str());
+    cenv[env.size()] = NULL;
+
+    return cenv;
+}
+
+std::string GetMetadata(const std::string & file)
+{
+    int mystdin[2];
+    int mystdout[2];
+    int mystderr[2];
+
+    // Open pipes
+    if (pipe(mystdin) == -1)
     {
-        // +1 as the array needs to be NULL terminated
-        char ** cenv = new char * [env.size() + 1];
-
-        for (unsigned int i=0; i<env.size(); ++i)
-            cenv[i] = const_cast<char *> (env.at(i).c_str());
-        cenv[env.size()] = NULL;
-
-        return cenv;
+        std::perror("pipe");
+    }
+    if (pipe(mystdout) == -1)
+    {
+        std::perror("pipe");
+    }
+    if (pipe(mystderr) == -1)
+    {
+        std::perror("pipe");
     }
 
-    std::string GetMetadata(const std::string & file)
+    // Fork
+    pid_t pid = fork();
+    switch (pid)
     {
-        int mystdin[2];
-        int mystdout[2];
-        int mystderr[2];
+        case -1:
+            std::perror("fork");
+            break;
+        case 0:
+            // Duplicate pipes to std* file descriptors
+            dup2(mystdin[0], 0);
+            dup2(mystdout[1], 1);
+            dup2(mystderr[1], 2);
 
-        // Open pipes
-        if (pipe(mystdin) == -1)
-        {
-            std::perror("pipe");
-        }
-        if (pipe(mystdout) == -1)
-        {
-            std::perror("pipe");
-        }
-        if (pipe(mystderr) == -1)
-        {
-            std::perror("pipe");
-        }
+            execl("/bin/bash", "-c", LIBEXECDIR "netlink-uevent.sh", file.c_str(), NULL);
+            break;
+        default:
+            int status;
+            waitpid(pid, &status, 0);
 
-        // Fork
-        pid_t pid = fork();
-        switch (pid)
-        {
-            case -1:
-                std::perror("fork");
-                break;
-            case 0:
-                // Duplicate pipes to std* file descriptors
-                dup2(mystdin[0], 0);
-                dup2(mystdout[1], 1);
-                dup2(mystderr[1], 2);
+            if (WIFEXITED(status))
+            {
+                char buf[1024];
+                ssize_t size = read(mystdout[0], buf, 1024);
+                buf[size] = 0;
+                return std::string(buf);
+            }
+            else
+            {
+                Logger::get_instance()->Log(ERR, "Child exited abnormally.");
+            }
+    }
+    return std::string();
+}
 
-                execl("/bin/bash", "-c", LIBEXECDIR "netlink-uevent.sh", file.c_str(), NULL);
-                break;
-            default:
-                int status;
-                waitpid(pid, &status, 0);
+void RunBashFunction(const std::string & file, const std::string & function, const std::vector<std::string> & envvars)
+{
+    int mystdin[2];
+    int mystdout[2];
+    int mystderr[2];
 
-                if (WIFEXITED(status))
-                {
-                    char buf[1024];
-                    ssize_t size = read(mystdout[0], buf, 1024);
-                    buf[size] = 0;
-                    return std::string(buf);
-                }
-                else
-                {
-                    Logger::get_instance()->Log(ERR, "Child exited abnormally.");
-                }
-        }
-        return std::string();
+    // Open pipes
+    if (pipe(mystdin) == -1)
+    {
+        std::perror("pipe");
+    }
+    if (pipe(mystdout) == -1)
+    {
+        std::perror("pipe");
+    }
+    if (pipe(mystderr) == -1)
+    {
+        std::perror("pipe");
     }
 
-    void RunBashFunction(const std::string & file, const std::string & function, const std::vector<std::string> & envvars)
+    // Fork
+    pid_t pid = fork();
+    switch (pid)
     {
-        int mystdin[2];
-        int mystdout[2];
-        int mystderr[2];
+        case -1:
+            std::perror("fork");
+            break;
 
-        // Open pipes
-        if (pipe(mystdin) == -1)
-        {
-            std::perror("pipe");
-        }
-        if (pipe(mystdout) == -1)
-        {
-            std::perror("pipe");
-        }
-        if (pipe(mystderr) == -1)
-        {
-            std::perror("pipe");
-        }
+        case 0:
+            // Duplicate pipes to std* file descriptors
+            dup2(mystdin[0], 0);
+            dup2(mystdout[1], 1);
+            dup2(mystderr[1], 2);
 
-        // Fork
-        pid_t pid = fork();
-        switch (pid)
-        {
-            case -1:
-                std::perror("fork");
-                break;
+            char ** envarray;
+            envarray = charptrarray(envvars);
+            execle("/bin/bash", "-c", LIBEXECDIR "bash-run.sh", file.c_str(), function.c_str(), NULL, envarray);
+            delete[] envarray;
+            break;
 
-            case 0:
-                // Duplicate pipes to std* file descriptors
-                dup2(mystdin[0], 0);
-                dup2(mystdout[1], 1);
-                dup2(mystderr[1], 2);
-
-                char ** envarray;
-                envarray = charptrarray(envvars);
-                execle("/bin/bash", "-c", LIBEXECDIR "bash-run.sh", file.c_str(), function.c_str(), NULL, envarray);
-                delete[] envarray;
-                break;
-
-            default:
-                int status;
-                waitpid(pid, &status, 0);
-        }
+        default:
+            int status;
+            waitpid(pid, &status, 0);
     }
 }

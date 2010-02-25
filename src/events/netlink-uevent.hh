@@ -28,7 +28,7 @@
 class NetlinkUevent : public EventManager
 {
     private:
-        genesis::Configuration * UEventConfiguration;
+        Configuration * UEventConfiguration;
         std::list<eventhandler> eventsubscriptions;
         int netlinksocket;
 

@@ -23,15 +23,12 @@
 #include <string>
 #include <vector>
 
-namespace genesis
-{
-    char **charptrarray(const std::vector<std::string> & env);
+char **charptrarray(const std::vector<std::string> & env);
 
-    // Sources file and returns SUBSCRIPTION_* variables from it
-    std::string GetMetadata(const std::string & file);
+// Sources file and returns SUBSCRIPTION_* variables from it
+std::string GetMetadata(const std::string & file);
 
-    // Runs specified function with predetermined environment
-    void RunBashFunction(const std::string & file, const std::string & function, const std::vector<std::string> & envvars);
-}
+// Runs specified function with predetermined environment
+void RunBashFunction(const std::string & file, const std::string & function, const std::vector<std::string> & envvars);
 
 #endif

@@ -30,12 +30,10 @@
 #include <events/netlink-uevent.hh>
 #include <events/netlink-route.hh>
 #include <events/genesis-fifo.hh>
-#include <config.hh>
 #include <utils.hh>
 
 namespace
 {
-    using namespace genesis;
     const std::string GenesisVersion = "0.1alpha0";
 }
 
@@ -95,10 +93,6 @@ int main(int argc, char * argv[])
 {
     WelcomeBlurb();
 
-    // Read config file
-    genesis::Configuration ModulesConfiguration(SYSCONFDIR "config", "modules");
-    genesis::Configuration GenesisConfiguration(SYSCONFDIR "config", "genesis");
-
     Logger::get_instance()->set_log_level(INFO);
 
     EventListener listener;
@@ -111,7 +105,5 @@ int main(int argc, char * argv[])
     {
         listener.listen();
     }
-
-    return 0;
 }
 

@@ -23,20 +23,17 @@
 #include <map>
 #include <string>
 
-namespace genesis
+class Configuration
 {
-    class Configuration
-    {
-        private:
-            std::string section;
-            mutable std::map<std::string, std::string> options;
+    private:
+        std::string section;
+        mutable std::map<std::string, std::string> options;
 
-        public:
-            Configuration(std::string conffile, std::string modulename);
-            Configuration(std::string conffile, std::string modulename, std::map<std::string, std::string> defaultconfiguration);
-            void Construct(std::string conffile, std::string modulename, std::map<std::string, std::string> defaultconfiguration);
-            std::string get_option(const std::string key) const;
-    };
-}
+    public:
+        Configuration(std::string conffile, std::string modulename);
+        Configuration(std::string conffile, std::string modulename, std::map<std::string, std::string> defaultconfiguration);
+        void Construct(std::string conffile, std::string modulename, std::map<std::string, std::string> defaultconfiguration);
+        std::string get_option(const std::string key) const;
+};
 
 #endif
