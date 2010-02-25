@@ -25,6 +25,7 @@
 #include <sys/mount.h>
 
 #include <actions/action.hh>
+#include <logger.hh>
 #include <events/event.hh>
 #include <events/netlink-uevent.hh>
 #include <events/netlink-route.hh>
@@ -46,7 +47,7 @@ class EventListener
     public:
         void add_eventsource(EventManager * eventmanager);
         void listen();
-	void send_event(std::string event);
+        void send_event(std::string event);
 };
 
 void EventListener::add_eventsource(EventManager * eventmanager)
@@ -75,6 +76,7 @@ void EventListener::listen()
             if (action != NULL)
             {
                 action->Execute();
+                Logger::get_instance()->Log(INFO, action->Identity());
                 send_event(action->Identity());
             }
         }
@@ -97,12 +99,7 @@ int main(int argc, char * argv[])
     genesis::Configuration ModulesConfiguration(SYSCONFDIR "config", "modules");
     genesis::Configuration GenesisConfiguration(SYSCONFDIR "config", "genesis");
 
-    // Open log file
-    std::ofstream Logfile;
-    if (GenesisConfiguration.get_option("logging") == "file")
-    {
-        Logfile.open(GenesisConfiguration.get_option("logfile").c_str());
-    }
+    Logger::get_instance()->set_log_level(INFO);
 
     EventListener listener;
     listener.add_eventsource(new GenesisFIFO());

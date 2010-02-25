@@ -5,6 +5,7 @@ genesis_SOURCES = \
 	bash.cc bash.hh \
 	config.cc config.hh \
 	genesis.cc \
+	logger.cc logger.hh \
 	utils.cc utils.hh
 
 LDADD = events/libevents.la actions/libaction.la $(PCREPLUSPLUS_LIBS)
