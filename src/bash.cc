@@ -23,6 +23,7 @@
 #include <sys/wait.h>
 
 #include <bash.hh>
+#include <logger.hh>
 
 namespace genesis
 {
@@ -86,7 +87,7 @@ namespace genesis
                 }
                 else
                 {
-                    std::cout << "Child exited abnormally." << std::endl;
+                    Logger::get_instance()->Log(ERR, "Child exited abnormally.");
                 }
         }
         return std::string();

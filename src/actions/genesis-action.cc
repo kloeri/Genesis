@@ -4,12 +4,13 @@
 #include <iostream>
 #include <string>
 #include "genesis-action.hh"
+#include <logger.hh>
 
 void GenesisAction::Execute()
 {
     if (command == "exit")
     {
-        std::cout << "Genesis received exit command." << std::endl;
+        Logger::get_instance()->Log(INFO, "Genesis received exit command.");
         exit(0);
     }
 }
