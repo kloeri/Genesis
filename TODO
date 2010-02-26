@@ -20,7 +20,6 @@ Scripts
 - Write enough scripts that we can boot machines properly using Genesis
 
 General/core Genesis hacking
-- Update copyright messages to 2010 and make sure all .cc/.hh files has proper copyright messages
 - Better configuration/option handling
 - Implement log destinations support
 	Support multiple destinations with different independent loglevels

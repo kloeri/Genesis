@@ -24,5 +24,5 @@
 
 void WelcomeBlurb()
 {
-    std::cout << "Genesis (c) 2009 Bryan Østergaard <kloeri@exherbo.org>" << std::endl;
+    std::cout << "Genesis (c) 2010 Bryan Østergaard <kloeri@exherbo.org>" << std::endl;
 }
