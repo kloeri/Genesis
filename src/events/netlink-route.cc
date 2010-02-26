@@ -1,7 +1,7 @@
 /* vim: set sw=4 sts=4 et foldmethod=syntax : */
 
 /*
- * Copyright (c) 2009 Bryan Østergaard
+ * Copyright (c) 2010 Bryan Østergaard
  *
  * This file is part of the Genesis initsystem. Genesis is free software;
  * you can redistribute it and/or modify it under the terms of the GNU General
