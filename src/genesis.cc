@@ -75,6 +75,7 @@ void EventListener::listen()
             {
                 action->Execute();
                 Logger::get_instance()->Log(INFO, action->Identity());
+                Logger::get_instance()->Log(DEBUG, "Result of Execute(): " + action->GetResult());
                 send_event(action->Identity());
             }
         }
@@ -93,7 +94,7 @@ int main(int argc, char * argv[])
 {
     WelcomeBlurb();
 
-    Logger::get_instance()->set_log_level(INFO);
+    Logger::get_instance()->set_log_level(DEBUG);
 
     EventListener listener;
     listener.add_eventsource(new GenesisFIFO());
