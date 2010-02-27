@@ -30,7 +30,6 @@
 #include <events/netlink-uevent.hh>
 #include <events/netlink-route.hh>
 #include <events/genesis-fifo.hh>
-#include <utils.hh>
 
 namespace
 {
@@ -102,7 +101,7 @@ void EventListener::send_event(std::string event)
 
 int main(int argc, char * argv[])
 {
-    WelcomeBlurb();
+    std::cout << "Genesis (c) 2010 Bryan Østergaard <kloeri@exherbo.org>" << std::endl;
 
     Logger::get_instance()->set_log_level(DEBUG);
 

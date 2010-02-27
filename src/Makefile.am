@@ -13,8 +13,7 @@ genesis_SOURCES = \
 	bash.cc bash.hh \
 	config.cc config.hh \
 	genesis.cc \
-	logger.cc logger.hh \
-	utils.cc utils.hh
+	logger.cc logger.hh
 
 genesis_LINK = $(LIBTOOL) --tag=CXX --mode=link $(CC) -all-static $(genesis_LDFLAGS) -o $@
 genesis_LDADD = events/libevents.la actions/libaction.la
