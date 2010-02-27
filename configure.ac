@@ -31,6 +31,7 @@ fi
 
 AC_SUBST(LIBSTDCXX_A)
 
+AM_SILENT_RULES([no])
 AC_CONFIG_FILES([
    Makefile
 ])

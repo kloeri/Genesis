@@ -49,6 +49,6 @@ src_genesis_CPPFLAGS = $(AM_CPPFLAGS) -I $(top_srcdir)/src
 src_genesis_CXXFLAGS = $(PCREPLUSPLUS_CFLAGS)
 src_genesis_LDFLAGS = @LIBSTDCXX_A@ $(patsubst .so,.a,$(PCREPLUSPLUS_LIBS))
 
-src_genesis_LINK = $(LIBTOOL) --tag=CXX --mode=link $(CC) -all-static $(src_genesis_LDFLAGS) -o $@
+src_genesis_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(CC) -all-static $(src_genesis_LDFLAGS) -o $@
 src_genesis_LDADD = src/events/libevents.la src/actions/libaction.la
 
