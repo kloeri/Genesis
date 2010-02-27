@@ -30,7 +30,7 @@ void BashAction::Execute()
     }
     if (_command == "run-function")
     {
-        RunBashFunction(_script, _function, _env);
+        _result = RunBashFunction(_script, _function, _env);
     }
 }
 

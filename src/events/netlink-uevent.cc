@@ -285,12 +285,8 @@ int NetlinkUevent::get_fd()
     return netlinksocket;
 }
 
-void NetlinkUevent::new_event(std::string event)
+Action * NetlinkUevent::new_event(std::string event)
 {
-    Action * action = ProcessEvent(event);
-    if (action != NULL)
-    {
-        action->Execute();
-    }
+    return ProcessEvent(event);
 }
 

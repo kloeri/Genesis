@@ -26,6 +26,7 @@
 #include <sys/socket.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
+#include <actions/action.hh>
 #include <events/event.hh>
 #include <pcre++.h>
 
@@ -56,7 +57,7 @@ class NetlinkRoute : public EventManager
         Action * GetEvent();
         Action * ProcessEvent(std::string event);
         int get_fd();
-        void new_event(std::string event);
+        Action * new_event(std::string event);
 };
 
 #endif

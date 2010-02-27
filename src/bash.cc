@@ -91,7 +91,7 @@ std::string GetMetadata(const std::string & file)
     return std::string();
 }
 
-void RunBashFunction(const std::string & file, const std::string & function, const std::vector<std::string> & envvars)
+std::string RunBashFunction(const std::string & file, const std::string & function, const std::vector<std::string> & envvars)
 {
     int mystdin[2];
     int mystdout[2];
@@ -134,5 +134,18 @@ void RunBashFunction(const std::string & file, const std::string & function, con
         default:
             int status;
             waitpid(pid, &status, 0);
+
+            if (WIFEXITED(status))
+            {
+                char buf[4096];
+                ssize_t size = read(mystdout[0], buf, 4096);
+                buf[size] = 0;
+                return std::string(buf);
+            }
+            else
+            {
+                Logger::get_instance()->Log(ERR, "Child exited abnormally.");
+            }
     }
+    return std::string();
 }

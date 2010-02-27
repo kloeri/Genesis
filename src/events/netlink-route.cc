@@ -521,7 +521,8 @@ int NetlinkRoute::get_fd()
     return netlinksocket;
 }
 
-void NetlinkRoute::new_event(std::string event)
+Action * NetlinkRoute::new_event(std::string event)
 {
+    return NULL;
 }
 
