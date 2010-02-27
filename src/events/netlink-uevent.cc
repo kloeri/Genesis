@@ -166,8 +166,9 @@ void NetlinkUevent::SourceScripts(std::string path)
 
             BashAction * action = new BashAction("get-metadata", scriptfile);
             action->Execute();
-
             std::stringstream envvars(action->GetResult());
+            delete action;
+
             while (envvars.good())
             {
                 std::string line;

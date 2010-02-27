@@ -62,8 +62,11 @@ void EventListener::listen()
 
     for (std::map<int, EventManager *>::iterator iter = eventmanagers.begin(); iter != eventmanagers.end(); ++iter)
     {
-        FD_SET(iter->first, &readfds);
-        maxfd = iter->first > maxfd ? iter->first : maxfd;
+        if (iter->first >= 0)
+        {
+            FD_SET(iter->first, &readfds);
+            maxfd = iter->first > maxfd ? iter->first : maxfd;
+        }
     }
     select(maxfd + 1, &readfds, NULL, NULL, NULL);
     for (std::map<int, EventManager *>::iterator iter = eventmanagers.begin(); iter != eventmanagers.end(); ++iter)
@@ -86,7 +89,14 @@ void EventListener::send_event(std::string event)
 {
     for (std::map<int, EventManager *>::iterator iter = eventmanagers.begin(); iter != eventmanagers.end(); ++iter)
     {
-        iter->second->new_event(event);
+        Action * action = iter->second->new_event(event);
+        if (action != NULL)
+        {
+            action->Execute();
+            Logger::get_instance()->Log(INFO, action->Identity());
+            Logger::get_instance()->Log(DEBUG, "Result of Execute(): " + action->GetResult());
+            send_event(action->Identity());
+        }
     }
 }
 
