@@ -5,7 +5,7 @@ AC_INIT([genesis], [0.0], [http://bugs.exherbo.org])
 AC_CONFIG_SRCDIR([src/genesis.cc])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([1.11.1 dist-bzip2 no-dist-gzip])
+AM_INIT_AUTOMAKE([1.11.1 dist-bzip2 no-dist-gzip subdir-objects])
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -33,10 +33,6 @@ AC_SUBST(LIBSTDCXX_A)
 
 AC_CONFIG_FILES([
    Makefile
-   scripts/Makefile
-   src/Makefile
-   src/actions/Makefile
-   src/events/Makefile
 ])
 
 AC_OUTPUT
