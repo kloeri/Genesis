@@ -25,4 +25,8 @@ Makefile.in
 /missing
 /m4
 
+/src/.dirstamp
 /src/genesis
+/src/actions/.dirstamp
+/src/events/.dirstamp
+
