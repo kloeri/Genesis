@@ -21,6 +21,8 @@
 #define SRC_GUARD_EVENTS_GENESIS_FIFO_HH 1
 
 #include <fstream>
+#include <list>
+#include <string>
 #include <actions/action.hh>
 #include <events/event.hh>
 
@@ -33,6 +35,8 @@ class GenesisFIFO : public EventManager
         // Sets up the /dev/genesis fifo / command channel
         GenesisFIFO();
         ~GenesisFIFO();
+
+        std::list<std::string> get_events();
 
         // Listens for data on /dev/genesis fifo and sends Actions to genesis proper
         Action * GetEvent();

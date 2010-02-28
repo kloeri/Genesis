@@ -20,6 +20,8 @@
 #ifndef SRC_GUARD_EVENTS_EVENT_HH
 #define SRC_GUARD_EVENTS_EVENT_HH 1
 
+#include <list>
+#include <string>
 #include <pcre++.h>
 #include <actions/action.hh>
 
@@ -34,6 +36,7 @@ struct eventhandler
 class EventManager
 {
     public:
+	virtual std::list<std::string> get_events() = 0;
         virtual Action * GetEvent() = 0;
         virtual int get_fd() = 0;
         virtual ~EventManager() {}

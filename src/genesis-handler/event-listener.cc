@@ -38,6 +38,15 @@ EventListener::add_eventsource(EventManager * eventmanager)
 {
     int fd = eventmanager->get_fd();
     eventmanagers[fd] = eventmanager;
+
+    // Grab all 'coldplug' events
+    std::list<std::string> coldplug_events = eventmanager->get_events();
+    eventqueue.splice(eventqueue.end(), coldplug_events);
+}
+
+void EventListener::add_event(std::string event)
+{
+    eventqueue.push_back(event);
 }
 
 void
@@ -70,6 +79,26 @@ EventListener::listen()
             }
         }
     }
+}
+
+void
+EventListener::process_eventqueue()
+{
+    for (std::list<std::string>::iterator event = eventqueue.begin(); event != eventqueue.end(); ++event)
+    {
+        for (std::map<int, EventManager *>::iterator iter = eventmanagers.begin(); iter != eventmanagers.end(); ++iter)
+        {
+            Action * action = iter->second->new_event(*event);
+            if (action != NULL)
+            {
+                action->Execute();
+                Logger::get_instance().Log(INFO, action->Identity());
+                Logger::get_instance().Log(DEBUG, "Result of Execute(): " + action->GetResult());
+                send_event(action->Identity());
+            }
+        }
+    }
+    eventqueue.clear();
 }
 
 void

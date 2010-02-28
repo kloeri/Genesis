@@ -54,6 +54,7 @@ class NetlinkRoute : public EventManager
     public:
         NetlinkRoute();
         ~NetlinkRoute();
+        std::list<std::string> get_events();
         Action * GetEvent();
         Action * ProcessEvent(std::string event);
         int get_fd();

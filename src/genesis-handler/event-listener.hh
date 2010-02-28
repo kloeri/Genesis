@@ -28,13 +28,17 @@ class EventListener
 {
     private:
         std::map<int, EventManager *> eventmanagers;
+        std::list<std::string> eventqueue;
+
+        void send_event(std::string event);
 
     public:
         ~EventListener(void);
 
         void add_eventsource(EventManager * eventmanager);
+        void add_event(std::string event);
         void listen();
-        void send_event(std::string event);
+        void process_eventqueue();
 };
 
 #endif

@@ -35,9 +35,6 @@ class NetlinkUevent : public EventManager
         // Generate a list of coldplug events
         void GenerateEvents();
 
-        // Emit coldplug events
-        void EmitEvents();
-
         // Actual method responsible for the netlink uevent socket setup
         void * OpenSocket(int domain, int type, int protocol, int multicastgroup);
 
@@ -48,6 +45,9 @@ class NetlinkUevent : public EventManager
         // Sets up default configuration, does coldplugging if wanted and sets up the netlink uevent socket
         NetlinkUevent();
         ~NetlinkUevent();
+
+        // Return all queued events (think coldplugging) and clear the internal queue
+        std::list<std::string> get_events();
 
         // Handles raw events, matching them to subscriptions and sending Actions to genesis proper as needed
         Action * ProcessEvent(std::string event);

@@ -52,6 +52,11 @@ GenesisFIFO::~GenesisFIFO()
     unlink("/dev/genesis");
 }
 
+std::list<std::string> GenesisFIFO::get_events()
+{
+    return std::list<std::string>();
+}
+
 int GenesisFIFO::get_fd()
 {
     return fd;

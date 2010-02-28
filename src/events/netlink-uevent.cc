@@ -113,21 +113,6 @@ void NetlinkUevent::GenerateEvents()
     }
 }
 
-void NetlinkUevent::EmitEvents()
-{
-    for (std::list<std::string>::const_iterator iter = events.begin(); iter != events.end(); ++iter)
-    {
-        Action * action = ProcessEvent(*iter);
-        if (action != 0)
-        {
-            action->Execute();
-            Logger::get_instance().Log(DEBUG, "NetlinkUevent::EmitEvents emitted: " + action->Identity());
-            Logger::get_instance().Log(DEBUG, "Result of Execute(): " + action->GetResult());
-        }
-        delete action;
-    }
-}
-
 //
 // Open sockets for all supported netlink protocols
 //
@@ -146,11 +131,16 @@ NetlinkUevent::NetlinkUevent()
     {
         Logger::get_instance().Log(DEBUG, "Generating coldplug events..");
         GenerateEvents();
-        Logger::get_instance().Log(DEBUG, "Emitting coldplug events..");
-        EmitEvents();
     }
 
     OpenSocket(PF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT, 1);
+}
+
+std::list<std::string> NetlinkUevent::get_events()
+{
+    std::list<std::string> queuedevents;
+    queuedevents.splice(queuedevents.end(), events);
+    return queuedevents;
 }
 
 void NetlinkUevent::SourceScripts(std::string path)

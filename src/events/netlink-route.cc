@@ -517,6 +517,12 @@ Action * NetlinkRoute::ProcessEvent(std::string event)
     return 0;
 }
 
+// There's no 'coldplugging' for network events so just return an empty list
+std::list<std::string> NetlinkRoute::get_events()
+{
+    return std::list<std::string>();
+}
+
 int NetlinkRoute::get_fd()
 {
     return netlinksocket;
