@@ -1,4 +1,4 @@
-# vim: set ts=8 :
+# vim: set sw=4 ts=8 :
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -44,6 +44,7 @@ src_genesis_handler_genesis_handler_SOURCES = src/genesis-handler/bash.cc       
 					      src/genesis-handler/genesis-handler.cc \
 					      src/genesis-handler/logger.cc          \
 					      src/genesis-handler/logger.hh          \
+					      src/genesis-handler/singleton.hh       \
 					      $(NULL)
 
 src_genesis_handler_genesis_handler_CXXFLAGS = $(PCREPLUSPLUS_CFLAGS)

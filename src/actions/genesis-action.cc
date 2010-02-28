@@ -27,7 +27,7 @@ void GenesisAction::Execute()
 {
     if (command == "exit")
     {
-        Logger::get_instance()->Log(INFO, "Genesis received exit command.");
+        Logger::get_instance().Log(INFO, "Genesis received exit command.");
         exit(0);
     }
 }

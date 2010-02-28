@@ -20,15 +20,6 @@
 #include <iostream>
 #include "logger.hh"
 
-Logger * Logger::get_instance()
-{
-    if (instance == NULL)
-    {
-        instance = new Logger();
-    }
-    return instance;
-}
-
 void Logger::set_log_level(Loglevel level)
 {
     minimum_log_level = level;
@@ -66,6 +57,4 @@ void Logger::Log(Loglevel level, std::string message)
     }
     std::cout << message << std::endl;
 }
-
-Logger * Logger::instance = NULL;
 

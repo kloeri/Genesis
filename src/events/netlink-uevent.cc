@@ -121,8 +121,8 @@ void NetlinkUevent::EmitEvents()
         if (action != 0)
         {
             action->Execute();
-            Logger::get_instance()->Log(DEBUG, "NetlinkUevent::EmitEvents emitted: " + action->Identity());
-            Logger::get_instance()->Log(DEBUG, "Result of Execute(): " + action->GetResult());
+            Logger::get_instance().Log(DEBUG, "NetlinkUevent::EmitEvents emitted: " + action->Identity());
+            Logger::get_instance().Log(DEBUG, "Result of Execute(): " + action->GetResult());
         }
         delete action;
     }
@@ -144,9 +144,9 @@ NetlinkUevent::NetlinkUevent()
 
     if (UEventConfiguration->get_option("coldplug") == "yes")
     {
-        Logger::get_instance()->Log(DEBUG, "Generating coldplug events..");
+        Logger::get_instance().Log(DEBUG, "Generating coldplug events..");
         GenerateEvents();
-        Logger::get_instance()->Log(DEBUG, "Emitting coldplug events..");
+        Logger::get_instance().Log(DEBUG, "Emitting coldplug events..");
         EmitEvents();
     }
 
@@ -178,7 +178,7 @@ void NetlinkUevent::SourceScripts(std::string path)
                     int delimiter = line.find(", ");
                     std::string function(line.substr(0, delimiter));
                     std::string match(line.substr(delimiter + 2, line.size()));
-                    Logger::get_instance()->Log(DEBUG, "NetlinkUevent::SourceScripts adding event: " + match);
+                    Logger::get_instance().Log(DEBUG, "NetlinkUevent::SourceScripts adding event: " + match);
                     eventsubscriptions.push_back(eventhandler(scriptfile, function, pcrepp::Pcre(match)));
                 }
             }

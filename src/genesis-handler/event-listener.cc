@@ -64,8 +64,8 @@ EventListener::listen()
             if (action != NULL)
             {
                 action->Execute();
-                Logger::get_instance()->Log(INFO, action->Identity());
-                Logger::get_instance()->Log(DEBUG, "Result of Execute(): " + action->GetResult());
+                Logger::get_instance().Log(INFO, action->Identity());
+                Logger::get_instance().Log(DEBUG, "Result of Execute(): " + action->GetResult());
                 send_event(action->Identity());
             }
         }
@@ -81,8 +81,8 @@ EventListener::send_event(std::string event)
         if (action != NULL)
         {
             action->Execute();
-            Logger::get_instance()->Log(INFO, action->Identity());
-            Logger::get_instance()->Log(DEBUG, "Result of Execute(): " + action->GetResult());
+            Logger::get_instance().Log(INFO, action->Identity());
+            Logger::get_instance().Log(DEBUG, "Result of Execute(): " + action->GetResult());
             send_event(action->Identity());
         }
     }

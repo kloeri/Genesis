@@ -28,11 +28,12 @@
 
 int main(int argc, char * argv[])
 {
+    Logger logger;
+    EventListener listener;
+
     std::cout << "Genesis (c) 2010 Bryan Østergaard <kloeri@exherbo.org>" << std::endl;
 
-    Logger::get_instance()->set_log_level(DEBUG);
-
-    EventListener listener;
+    logger.set_log_level(DEBUG);
 
     listener.add_eventsource(new GenesisFIFO());
     listener.add_eventsource(new NetlinkUevent());

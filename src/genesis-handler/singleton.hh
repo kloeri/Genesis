@@ -1,7 +1,6 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
-
+/* vim: set et fdm=syntax sts=4 sw=4 : */
 /*
- * Copyright (c) 2010 Bryan Østergaard
+ * Copyright © 2000 Scott Bilas
  *
  * This file is part of the Genesis initsystem. Genesis is free software;
  * you can redistribute it and/or modify it under the terms of the GNU General
@@ -17,30 +16,39 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef SRC_GENESIS_HANDLER_GUARD_LOGGER_HH
-#define SRC_GENESIS_HANDLER_GUARD_LOGGER_HH 1
+#ifndef SRC_UTIL_SINGLETON_HH
+#define SRC_UTIL_SINGLETON_HH
 
-#include <genesis-handler/singleton.hh>
+#include <cassert>
 
-enum Loglevel
-{
-    DEBUG,
-    INFO,
-    NOTICE,
-    WARN,
-    CRIT,
-    ERR
-};
-
-class Logger
-    : public Singleton<Logger>
+template <typename type_>
+class Singleton
 {
     private:
-        Loglevel minimum_log_level;
+        static type_ *_instance;
 
     public:
-        void set_log_level(Loglevel minlevel);
-        void Log(Loglevel level, std::string);
+        Singleton(void)
+        {
+            assert(! _instance);
+            _instance = static_cast<type_ *>(this);
+        }
+
+        virtual ~Singleton(void)
+        {
+            assert(_instance);
+            _instance = NULL;
+        }
+
+        static type_ & get_instance(void)
+        {
+            assert(_instance);
+            return *_instance;
+        }
 };
 
+template <typename type_>
+type_ * Singleton<type_>::_instance = NULL;
+
 #endif
+

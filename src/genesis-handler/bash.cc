@@ -85,7 +85,7 @@ std::string GetMetadata(const std::string & file)
             }
             else
             {
-                Logger::get_instance()->Log(ERR, "Child exited abnormally.");
+                Logger::get_instance().Log(ERR, "Child exited abnormally.");
             }
     }
     return std::string();
@@ -144,7 +144,7 @@ std::string RunBashFunction(const std::string & file, const std::string & functi
             }
             else
             {
-                Logger::get_instance()->Log(ERR, "Child exited abnormally.");
+                Logger::get_instance().Log(ERR, "Child exited abnormally.");
             }
     }
     return std::string();
