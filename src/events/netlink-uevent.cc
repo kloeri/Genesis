@@ -186,7 +186,7 @@ void NetlinkUevent::SourceScripts(std::string path)
     }
     else
     {
-        std::cerr << "Couldn't open the directory" << std::endl;
+        Logger::get_instance().Log(ERR, "netlink-uevent: Couldn't open the directory '" + path + "'");
     }
 }
 

@@ -30,6 +30,7 @@
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 
+#include <logger.hh>
 #include <events/netlink-route.hh>
 #include <actions/bash-action.hh>
 
@@ -88,7 +89,7 @@ void NetlinkRoute::SourceScripts(std::string path)
     }
     else
     {
-        std::cerr << "Couldn't open the directory" << std::endl;
+        Logger::get_instance().Log(ERR, "netlink-route: Couldn't open the directory '" + path + "'");
     }
 }
 
