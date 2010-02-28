@@ -17,8 +17,145 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <fstream>
 #include <iostream>
+
+#include <syslog.h>
+
 #include "logger.hh"
+
+LogDestination::LogDestination(std::basic_streambuf<char> *rdbuf)
+    : std::basic_ostream<char>(rdbuf)
+{
+}
+
+LogDestination::~LogDestination(void)
+{
+}
+
+StringLogger::StringLogger(std::basic_streambuf<char> *rdbuf)
+    : LogDestination(rdbuf)
+{
+}
+
+StringLogger::~StringLogger(void)
+{
+}
+
+void
+StringLogger::set_log_level(const Loglevel level)
+{
+    std::basic_ostream<char> & os(*static_cast<std::basic_ostream<char> *>(this));
+
+    switch (level)
+    {
+        case DEBUG:
+            os << "debug: ";
+            break;
+        case INFO:
+            os << "info: ";
+            break;
+        case NOTICE:
+            os << "notice: ";
+            break;
+        case WARN:
+            os << "warn: ";
+            break;
+        case ERR:
+            os << "error: ";
+            break;
+        case CRIT:
+            os << "critical: ";
+            break;
+    }
+}
+
+Console::Console(void)
+    : StringLogger(std::clog.rdbuf())
+{
+}
+
+File::File(const std::string & path, std::ios_base::openmode mode)
+    : StringLogger(std::ofstream(path.c_str(), mode).rdbuf())
+{
+}
+
+dmesg::dmesg(void)
+    : StringLogger(std::clog.rdbuf())
+{
+}
+
+syslog_streambuf::syslog_streambuf(void)
+{
+}
+
+syslog_streambuf::int_type
+syslog_streambuf::overflow(int_type c)
+{
+    if (! traits::eq_int_type(c, traits::eof()))
+        _buffer << traits::to_char_type(c);
+    return traits::not_eof(c);
+}
+
+int
+syslog_streambuf::sync(void)
+{
+    std::string temp(_buffer.str());
+
+    if (! temp.empty())
+    {
+        ::syslog(_log_level, temp.c_str());
+        _buffer.str("");
+    }
+
+    return 0;
+}
+
+void
+syslog_streambuf::set_log_level(const Loglevel level)
+{
+    switch (level)
+    {
+        case DEBUG:
+            _log_level = LOG_DEBUG;
+            break;
+        case INFO:
+            _log_level = LOG_INFO;
+            break;
+        case NOTICE:
+            _log_level = LOG_NOTICE;
+            break;
+        case WARN:
+            _log_level = LOG_WARNING;
+            break;
+        case ERR:
+            _log_level = LOG_ERR;
+            break;
+        case CRIT:
+            _log_level = LOG_CRIT;
+            break;
+    }
+}
+
+SysLog::SysLog(void)
+    : LogDestination(buffer::get())
+{
+}
+
+void
+SysLog::set_log_level(const Loglevel level)
+{
+    _buffer.set_log_level(level);
+}
+
+SysLog::~SysLog(void)
+{
+}
+
+Logger::Logger(LogDestination & destination)
+    : _log(destination)
+{
+}
 
 void Logger::set_log_level(Loglevel level)
 {
@@ -27,34 +164,19 @@ void Logger::set_log_level(Loglevel level)
 
 void Logger::Log(Loglevel level, std::string message)
 {
-    if (level < minimum_log_level)
+    if (level >= minimum_log_level)
     {
-        return;
+        _log << level << message << std::endl;
     }
-
-    switch (level)
-    {
-        case DEBUG:
-            std::cout << "debug: ";
-            break;
-        case INFO:
-            std::cout << "info: ";
-            break;
-        case NOTICE:
-            std::cout << "notice: ";
-            break;
-        case WARN:
-            std::cout << "warn: ";
-            break;
-        case ERR:
-            std::cout << "error: ";
-            break;
-        case CRIT:
-            std::cout << "critical: ";
-            break;
-        default:
-            std::cout << "unknown loglevel";
-    }
-    std::cout << message << std::endl;
 }
+
+LogDestination &
+operator<<(LogDestination & dest, const Loglevel level)
+{
+    dest.set_log_level(level);
+    return dest;
+}
+
+Console console_stream;
+SysLog syslog_stream;
 
