@@ -53,3 +53,5 @@ src_genesis_handler_genesis_handler_LDFLAGS = @LIBSTDCXX_A@ $(patsubst .so,.a,$(
 src_genesis_handler_genesis_handler_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(CC) -all-static $(src_genesis_handler_genesis_handler_LDFLAGS) -o $@
 src_genesis_handler_genesis_handler_LDADD = src/events/libevents.la src/actions/libaction.la
 
+MAINTAINERCLEANFILES = aclocal.m4 config.guess config.sub configure depcomp install-sh ltmain.sh Makefile.in missing
+
