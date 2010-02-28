@@ -37,7 +37,7 @@
 #include <bash.hh>
 #include <config.hh>
 #include <logger.hh>
-#include <netlink-uevent.hh>
+#include <events/netlink-uevent.hh>
 #include <actions/bash-action.hh>
 
 namespace

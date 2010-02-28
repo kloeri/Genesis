@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT([genesis], [0.1alpha0], [http://bugs.exherbo.org])
 
-AC_CONFIG_SRCDIR([src/genesis.cc])
+AC_CONFIG_SRCDIR([src/genesis-handler/genesis-handler.cc])
 AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([1.11.1 dist-bzip2 no-dist-gzip subdir-objects])

@@ -17,8 +17,8 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef SRC_GUARD_BASH_HH
-#define SRC_GUARD_BASH_HH 1
+#ifndef SRC_GENESIS_HANDLER_GUARD_BASH_HH
+#define SRC_GENESIS_HANDLER_GUARD_BASH_HH 1
 
 #include <string>
 #include <vector>

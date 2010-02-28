@@ -30,7 +30,7 @@
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 
-#include <netlink-route.hh>
+#include <events/netlink-route.hh>
 #include <actions/bash-action.hh>
 
 namespace

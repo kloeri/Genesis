@@ -1,4 +1,5 @@
 /* vim: set sw=4 sts=4 et foldmethod=syntax : */
+
 /*
  * Copyright (c) 2010 Bryan Østergaard
  *
@@ -16,26 +17,29 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef SRC_EVENT_LISTENER_HH
-#define SRC_EVENT_LISTENER_HH
+#ifndef SRC_GENESIS_HANDLER_GUARD_LOGGER_HH
+#define SRC_GENESIS_HANDLER_GUARD_LOGGER_HH 1
 
-#include <map>
-#include <string>
+enum Loglevel
+{
+    DEBUG,
+    INFO,
+    NOTICE,
+    WARN,
+    CRIT,
+    ERR
+};
 
-#include <events/event.hh>
-
-class EventListener
+class Logger
 {
     private:
-        std::map<int, EventManager *> eventmanagers;
+        static Logger * instance;
+        Loglevel minimum_log_level;
 
     public:
-        ~EventListener(void);
-
-        void add_eventsource(EventManager * eventmanager);
-        void listen();
-        void send_event(std::string event);
+        static Logger * get_instance();
+        void set_log_level(Loglevel minlevel);
+        void Log(Loglevel level, std::string);
 };
 
 #endif
-

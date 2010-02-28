@@ -2,11 +2,13 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-AM_CPPFLAGS = -Werror -Wall \
+AM_CPPFLAGS = -Werror -Wall                           \
+	      -I $(top_srcdir)/src                    \
+	      -I $(top_srcdir)/src/genesis-handler    \
 	      -DSYSCONFDIR=\"${sysconfdir}/genesis/\" \
 	      -DLIBEXECDIR=\"${libexecdir}/genesis/\"
 
-sbin_PROGRAMS = src/genesis
+sbin_PROGRAMS = src/genesis-handler/genesis-handler
 
 noinst_LTLIBRARIES = src/actions/libaction.la \
 		     src/events/libevents.la  \
@@ -22,8 +24,6 @@ src_actions_libaction_la_SOURCES = src/actions/action.hh         \
 				   src/actions/genesis-action.hh \
 				   $(NULL)
 
-src_actions_libaction_la_CPPFLAGS = $(AM_CPPFLAGS) -I $(top_srcdir)/src -I $(top_srcdir)/src/actions
-
 src_events_libevents_la_SOURCES = src/events/events.hh         \
 				  src/events/genesis-fifo.cc   \
 				  src/events/genesis-fifo.hh   \
@@ -33,24 +33,22 @@ src_events_libevents_la_SOURCES = src/events/events.hh         \
 				  src/events/netlink-uevent.hh \
 				  $(NULL)
 
-src_events_libevents_la_CPPFLAGS = $(AM_CPPFLAGS) -I $(top_srcdir)/src -I $(top_srcdir)/src/events
 src_events_libevents_la_CXXFLAGS = $(PCREPLUSPLUS_CFLAGS)
 
-src_genesis_SOURCES = src/bash.cc           \
-		      src/bash.hh           \
-		      src/config.cc         \
-		      src/config.hh         \
-		      src/event-listener.cc \
-		      src/event-listener.hh \
-		      src/genesis.cc        \
-		      src/logger.cc         \
-		      src/logger.hh         \
-		      $(NULL)
+src_genesis_handler_genesis_handler_SOURCES = src/genesis-handler/bash.cc            \
+					      src/genesis-handler/bash.hh            \
+					      src/genesis-handler/config.cc          \
+					      src/genesis-handler/config.hh          \
+					      src/genesis-handler/event-listener.cc  \
+					      src/genesis-handler/event-listener.hh  \
+					      src/genesis-handler/genesis-handler.cc \
+					      src/genesis-handler/logger.cc          \
+					      src/genesis-handler/logger.hh          \
+					      $(NULL)
 
-src_genesis_CPPFLAGS = $(AM_CPPFLAGS) -I $(top_srcdir)/src
-src_genesis_CXXFLAGS = $(PCREPLUSPLUS_CFLAGS)
-src_genesis_LDFLAGS = @LIBSTDCXX_A@ $(patsubst .so,.a,$(PCREPLUSPLUS_LIBS))
+src_genesis_handler_genesis_handler_CXXFLAGS = $(PCREPLUSPLUS_CFLAGS)
+src_genesis_handler_genesis_handler_LDFLAGS = @LIBSTDCXX_A@ $(patsubst .so,.a,$(PCREPLUSPLUS_LIBS))
 
-src_genesis_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(CC) -all-static $(src_genesis_LDFLAGS) -o $@
-src_genesis_LDADD = src/events/libevents.la src/actions/libaction.la
+src_genesis_handler_genesis_handler_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(CC) -all-static $(src_genesis_handler_genesis_handler_LDFLAGS) -o $@
+src_genesis_handler_genesis_handler_LDADD = src/events/libevents.la src/actions/libaction.la
 

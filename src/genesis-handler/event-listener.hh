@@ -1,5 +1,4 @@
 /* vim: set sw=4 sts=4 et foldmethod=syntax : */
-
 /*
  * Copyright (c) 2010 Bryan Østergaard
  *
@@ -17,23 +16,26 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef SRC_GUARD_CONFIG_HH
-#define SRC_GUARD_CONFIG_HH 1
+#ifndef SRC_GENESIS_HANDLER_EVENT_LISTENER_HH
+#define SRC_GENESIS_HANDLER_EVENT_LISTENER_HH
 
 #include <map>
 #include <string>
 
-class Configuration
+#include <events/event.hh>
+
+class EventListener
 {
     private:
-        std::string section;
-        mutable std::map<std::string, std::string> options;
+        std::map<int, EventManager *> eventmanagers;
 
     public:
-        Configuration(std::string conffile, std::string modulename);
-        Configuration(std::string conffile, std::string modulename, std::map<std::string, std::string> defaultconfiguration);
-        void Construct(std::string conffile, std::string modulename, std::map<std::string, std::string> defaultconfiguration);
-        std::string get_option(const std::string key) const;
+        ~EventListener(void);
+
+        void add_eventsource(EventManager * eventmanager);
+        void listen();
+        void send_event(std::string event);
 };
 
 #endif
+

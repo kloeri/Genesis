@@ -17,29 +17,23 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef SRC_GUARD_LOGGER_HH
-#define SRC_GUARD_LOGGER_HH 1
+#ifndef SRC_GENESIS_HANDLER_GUARD_CONFIG_HH
+#define SRC_GENESIS_HANDLER_GUARD_CONFIG_HH 1
 
-enum Loglevel
-{
-    DEBUG,
-    INFO,
-    NOTICE,
-    WARN,
-    CRIT,
-    ERR
-};
+#include <map>
+#include <string>
 
-class Logger
+class Configuration
 {
     private:
-        static Logger * instance;
-        Loglevel minimum_log_level;
+        std::string section;
+        mutable std::map<std::string, std::string> options;
 
     public:
-        static Logger * get_instance();
-        void set_log_level(Loglevel minlevel);
-        void Log(Loglevel level, std::string);
+        Configuration(std::string conffile, std::string modulename);
+        Configuration(std::string conffile, std::string modulename, std::map<std::string, std::string> defaultconfiguration);
+        void Construct(std::string conffile, std::string modulename, std::map<std::string, std::string> defaultconfiguration);
+        std::string get_option(const std::string key) const;
 };
 
 #endif

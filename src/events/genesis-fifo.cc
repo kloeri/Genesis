@@ -23,7 +23,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <cstring>
-#include <genesis-fifo.hh>
+#include <events/genesis-fifo.hh>
 #include <actions/genesis-action.hh>
 
 GenesisFIFO::GenesisFIFO()
