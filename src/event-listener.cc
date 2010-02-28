@@ -23,6 +23,16 @@
 
 #include <event-listener.hh>
 
+EventListener::~EventListener(void)
+{
+    std::map<int, EventManager *>::iterator manager;
+
+    for (manager = eventmanagers.begin(); manager != eventmanagers.end(); ++manager)
+    {
+        delete manager->second;
+    }
+}
+
 void
 EventListener::add_eventsource(EventManager * eventmanager)
 {

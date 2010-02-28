@@ -30,6 +30,8 @@ class EventListener
         std::map<int, EventManager *> eventmanagers;
 
     public:
+        ~EventListener(void);
+
         void add_eventsource(EventManager * eventmanager);
         void listen();
         void send_event(std::string event);
