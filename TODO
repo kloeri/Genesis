@@ -3,7 +3,6 @@ To do list for Genesis
 
 Fix autotools configuration
 - Make sure everything is installed in proper directories
-- Link genesis statically
 
 Documentation
 - Overall Genesis architecture
@@ -28,7 +27,7 @@ General/core Genesis hacking
 	Mostly done (we have /dev/genesis but only implement an "exit" command currently)
 - Rename /sbin/genesis to /sbin/genesis-handler and write a genesis client to communicate with genesis proper
 - Add error handling
-- Remove the pcre++ dependency and replace all the regex stuff with proper parsing
+- Remove the pcre++ dependency and replace all the regex stuff with a small language for matching event metadata
 - Fix bash env settings (PATH, shopts and whatever else is needed)
 - Go through the code and cleanup/fix all the small things that makes things explode
 
