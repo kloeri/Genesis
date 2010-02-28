@@ -27,7 +27,7 @@
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <actions/action.hh>
-#include <events/event.hh>
+#include <event-sources/event.hh>
 #include <pcre++.h>
 
 class NetlinkRoute : public EventManager

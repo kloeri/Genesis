@@ -10,8 +10,8 @@ AM_CPPFLAGS = -Werror -Wall                           \
 
 sbin_PROGRAMS = src/genesis-handler/genesis-handler
 
-noinst_LTLIBRARIES = src/actions/libaction.la \
-		     src/events/libevents.la  \
+noinst_LTLIBRARIES = src/actions/libaction.la               \
+		     src/event-sources/libevent-sources.la  \
 		     $(NULL)
 
 libexecprogdir = $(libexecdir)/genesis
@@ -24,17 +24,18 @@ src_actions_libaction_la_SOURCES = src/actions/action.hh         \
 				   src/actions/genesis-action.hh \
 				   $(NULL)
 
-src_events_libevents_la_SOURCES = src/events/events.hh         \
-				  src/events/genesis-fifo.cc   \
-				  src/events/genesis-fifo.hh   \
-				  src/events/netlink-route.cc  \
-				  src/events/netlink-route.hh  \
-				  src/events/netlink-uevent.cc \
-				  src/events/netlink-uevent.hh \
-				  $(NULL)
+src_event_sources_libevent_sources_la_SOURCES = src/event-sources/events.hh         \
+						src/event-sources/genesis-fifo.cc   \
+						src/event-sources/genesis-fifo.hh   \
+						src/event-sources/netlink-route.cc  \
+						src/event-sources/netlink-route.hh  \
+						src/event-sources/netlink-uevent.cc \
+						src/event-sources/netlink-uevent.hh \
+						$(NULL)
 
-src_events_libevents_la_CXXFLAGS = $(PCREPLUSPLUS_CFLAGS)
-src_events_libevents_la_LDFLAGS = $(PCREPLUSPLUS_LIBS)
+src_event_sources_libevent_sources_la_CXXFLAGS = $(PCREPLUSPLUS_CFLAGS)
+src_event_sources_libevent_sources_la_LDFLAGS = $(PCREPLUSPLUS_LIBS)
+src_event_sources_libevent_sources_la_LIBADD = src/actions/libaction.la
 
 src_genesis_handler_genesis_handler_SOURCES = src/genesis-handler/bash.cc            \
 					      src/genesis-handler/bash.hh            \
@@ -50,7 +51,7 @@ src_genesis_handler_genesis_handler_SOURCES = src/genesis-handler/bash.cc       
 
 src_genesis_handler_genesis_handler_CXXFLAGS = $(PCREPLUSPLUS_CFLAGS)
 src_genesis_handler_genesis_handler_LDFLAGS = -all-static $(PCREPLUSPLUS_LIBS)
-src_genesis_handler_genesis_handler_LDADD = src/events/libevents.la src/actions/libaction.la
+src_genesis_handler_genesis_handler_LDADD = src/event-sources/libevent-sources.la
 
 MAINTAINERCLEANFILES = aclocal.m4 ChangeLog config.guess config.sub configure depcomp install-sh ltmain.sh Makefile.in missing
 

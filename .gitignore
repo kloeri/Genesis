@@ -26,7 +26,7 @@ Makefile.in
 /m4
 
 /src/actions/.dirstamp
-/src/events/.dirstamp
+/src/event-sources/.dirstamp
 /src/genesis-handler/.dirstamp
 /src/genesis-handler/genesis-handler
 

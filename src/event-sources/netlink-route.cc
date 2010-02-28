@@ -31,7 +31,7 @@
 #include <linux/rtnetlink.h>
 
 #include <logger.hh>
-#include <events/netlink-route.hh>
+#include <event-sources/netlink-route.hh>
 #include <actions/bash-action.hh>
 
 namespace

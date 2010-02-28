@@ -24,7 +24,7 @@
 #include <list>
 #include <string>
 #include <actions/action.hh>
-#include <events/event.hh>
+#include <event-sources/event.hh>
 
 class GenesisFIFO : public EventManager
 {

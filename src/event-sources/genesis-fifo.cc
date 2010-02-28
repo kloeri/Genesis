@@ -24,7 +24,7 @@
 #include <fcntl.h>
 #include <cstring>
 #include <cerrno>
-#include <events/genesis-fifo.hh>
+#include <event-sources/genesis-fifo.hh>
 #include <actions/genesis-action.hh>
 #include <genesis-handler/logger.hh>
 

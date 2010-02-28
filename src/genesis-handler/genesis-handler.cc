@@ -21,9 +21,9 @@
 
 #include <logger.hh>
 #include <event-listener.hh>
-#include <events/genesis-fifo.hh>
-#include <events/netlink-route.hh>
-#include <events/netlink-uevent.hh>
+#include <event-sources/genesis-fifo.hh>
+#include <event-sources/netlink-route.hh>
+#include <event-sources/netlink-uevent.hh>
 
 
 int main(int argc, char * argv[])

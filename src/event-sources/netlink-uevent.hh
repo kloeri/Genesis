@@ -23,7 +23,7 @@
 #include <list>
 #include <utility>
 #include <config.hh>
-#include <events/event.hh>
+#include <event-sources/event.hh>
 
 class NetlinkUevent : public EventManager
 {
