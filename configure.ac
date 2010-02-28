@@ -8,6 +8,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([1.11.1 dist-bzip2 no-dist-gzip subdir-objects])
 
 AC_PROG_CXX
+AX_PROG_CXX_CXX0X(,AC_MSG_ERROR(No C++0x compiler found))
 AC_PROG_INSTALL
 
 LT_INIT

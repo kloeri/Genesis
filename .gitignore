@@ -24,6 +24,7 @@ Makefile.in
 /ltmain.sh
 /missing
 /m4
+!/m4/ax_prog_cxx_cxx0x.m4
 
 /src/actions/.dirstamp
 /src/event-sources/.dirstamp
