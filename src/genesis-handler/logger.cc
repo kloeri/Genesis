@@ -114,6 +114,10 @@ syslog_streambuf::sync(void)
 void
 syslog_streambuf::set_log_level(const Loglevel level)
 {
+    // sync before setting the log leve to ensure that the current message is
+    // logged at the correct level
+    sync();
+
     switch (level)
     {
         case DEBUG:
