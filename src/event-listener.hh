@@ -16,37 +16,24 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifndef SRC_EVENT_LISTENER_HH
+#define SRC_EVENT_LISTENER_HH
+
+#include <map>
 #include <string>
-#include <iostream>
 
-#include <logger.hh>
-#include <event-listener.hh>
-#include <events/genesis-fifo.hh>
-#include <events/netlink-route.hh>
-#include <events/netlink-uevent.hh>
+#include <events/event.hh>
 
-namespace
+class EventListener
 {
-    const std::string GenesisVersion = "0.1alpha0";
-}
+    private:
+        std::map<int, EventManager *> eventmanagers;
 
-int main(int argc, char * argv[])
-{
-    std::cout << "Genesis (c) 2010 Bryan Østergaard <kloeri@exherbo.org>" << std::endl;
+    public:
+        void add_eventsource(EventManager * eventmanager);
+        void listen();
+        void send_event(std::string event);
+};
 
-    Logger::get_instance()->set_log_level(DEBUG);
-
-    EventListener listener;
-
-    listener.add_eventsource(new GenesisFIFO());
-    listener.add_eventsource(new NetlinkUevent());
-    listener.add_eventsource(new NetlinkRoute());
-    listener.send_event("genesis-initialising");
-    listener.send_event("genesis-started");
-
-    while (true)
-    {
-        listener.listen();
-    }
-}
+#endif
 

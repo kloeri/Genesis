@@ -36,13 +36,15 @@ src_events_libevents_la_SOURCES = src/events/events.hh         \
 src_events_libevents_la_CPPFLAGS = $(AM_CPPFLAGS) -I $(top_srcdir)/src -I $(top_srcdir)/src/events
 src_events_libevents_la_CXXFLAGS = $(PCREPLUSPLUS_CFLAGS)
 
-src_genesis_SOURCES = src/bash.cc    \
-		      src/bash.hh    \
-		      src/config.cc  \
-		      src/config.hh  \
-		      src/genesis.cc \
-		      src/logger.cc  \
-		      src/logger.hh  \
+src_genesis_SOURCES = src/bash.cc           \
+		      src/bash.hh           \
+		      src/config.cc         \
+		      src/config.hh         \
+		      src/event-listener.cc \
+		      src/event-listener.hh \
+		      src/genesis.cc        \
+		      src/logger.cc         \
+		      src/logger.hh         \
 		      $(NULL)
 
 src_genesis_CPPFLAGS = $(AM_CPPFLAGS) -I $(top_srcdir)/src
