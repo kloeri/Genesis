@@ -34,6 +34,7 @@ src_events_libevents_la_SOURCES = src/events/events.hh         \
 				  $(NULL)
 
 src_events_libevents_la_CXXFLAGS = $(PCREPLUSPLUS_CFLAGS)
+src_events_libevents_la_LDFLAGS = $(PCREPLUSPLUS_LIBS)
 
 src_genesis_handler_genesis_handler_SOURCES = src/genesis-handler/bash.cc            \
 					      src/genesis-handler/bash.hh            \
