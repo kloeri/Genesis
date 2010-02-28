@@ -7,7 +7,6 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([1.11.1 dist-bzip2 no-dist-gzip subdir-objects])
 
-AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
 
@@ -22,14 +21,6 @@ if test x"$HAVE_PRCEPLUSPLUS" = "xyes" ; then
 else
     AC_MSG_ERROR([pcre++ (http://www.daemon.de/PCRE) is required])
 fi
-
-LIBSTDCXX_A=
-
-if test x"$CXX" = x"g++" ; then
-   LIBSTDCXX_A=`$CXX -print-file-name=libstdc++.a`
-fi
-
-AC_SUBST(LIBSTDCXX_A)
 
 AM_SILENT_RULES([no])
 AC_CONFIG_FILES([
