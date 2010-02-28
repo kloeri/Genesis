@@ -138,6 +138,8 @@ class Logger
 
         void set_log_level(Loglevel minlevel);
         void Log(Loglevel level, std::string);
+
+        void log(const Loglevel level, const std::string & tag, const std::string & message);
 };
 
 LogDestination &

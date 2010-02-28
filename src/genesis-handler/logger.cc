@@ -174,6 +174,15 @@ void Logger::Log(Loglevel level, std::string message)
     }
 }
 
+void
+Logger::log(const Loglevel level, const std::string & tag, const std::string & message)
+{
+    if (level >= minimum_log_level)
+    {
+        _log << level << tag << ": " << message << std::endl;
+    }
+}
+
 LogDestination &
 operator<<(LogDestination & dest, const Loglevel level)
 {
