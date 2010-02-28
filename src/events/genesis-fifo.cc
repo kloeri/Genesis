@@ -23,13 +23,24 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <cstring>
+#include <cerrno>
 #include <events/genesis-fifo.hh>
 #include <actions/genesis-action.hh>
+#include <genesis-handler/logger.hh>
 
 GenesisFIFO::GenesisFIFO()
 {
     // Create control FIFO and make sure it has the right permissions
-    int err = mkfifo("/dev/genesis", 0666);
+
+    int err = 0;
+
+    err = ::mkfifo("/dev/genesis", 0666);
+    if (err)
+    {
+        Logger::get_instance().Log(ERR, "genesis-fifo: failed to create FIFO: " + std::string(::strerror(errno)));
+        return;
+    }
+
     err = chmod("/dev/genesis", 0666);
 
     fd = open("/dev/genesis", O_RDWR);
