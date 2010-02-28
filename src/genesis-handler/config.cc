@@ -42,34 +42,38 @@ void Configuration::Construct(std::string conffile, std::string sectionname, std
     }
 
     std::ifstream config(conffile.c_str());
-    while (!config.eof())
+
+    if (config)
     {
-        std::string line;
-        std::getline(config, line);
-
-        // Remove comments
-        pcrepp::Pcre regex_comments("#.*");
-        line = regex_comments.replace(line, "");
-
-        if (section == sectionname)
+        while (!config.eof())
         {
-            pcrepp::Pcre regex_module("[ \t]*\\[([a-zA-Z]+)\\][ \t]*");
-            regex_module.search(line);
-            if (regex_module.matches() > -1)
-            {
-                section = regex_module.get_match(0);
-            }
+            std::string line;
+            std::getline(config, line);
 
-            pcrepp::Pcre regex_keyvalue("[ \t]*([a-zA-Z_-]+)[ \t]*=[ \t]*([a-zA-Z0-9/._]+)[ \t]*");
-            regex_keyvalue.search(line);
-            if (regex_keyvalue.matches() > -1)
+            // Remove comments
+            pcrepp::Pcre regex_comments("#.*");
+            line = regex_comments.replace(line, "");
+
+            if (section == sectionname)
             {
-                options[regex_keyvalue.get_match(0)] = regex_keyvalue.get_match(1);
+                pcrepp::Pcre regex_module("[ \t]*\\[([a-zA-Z]+)\\][ \t]*");
+                regex_module.search(line);
+                if (regex_module.matches() > -1)
+                {
+                    section = regex_module.get_match(0);
+                }
+
+                pcrepp::Pcre regex_keyvalue("[ \t]*([a-zA-Z_-]+)[ \t]*=[ \t]*([a-zA-Z0-9/._]+)[ \t]*");
+                regex_keyvalue.search(line);
+                if (regex_keyvalue.matches() > -1)
+                {
+                    options[regex_keyvalue.get_match(0)] = regex_keyvalue.get_match(1);
+                }
             }
-        }
-        else if (line[0] == '[')
-        {
-            section = line.substr(1, line.size() - 2);
+            else if (line[0] == '[')
+            {
+                section = line.substr(1, line.size() - 2);
+            }
         }
     }
 
