@@ -25,10 +25,6 @@
 #include <events/netlink-route.hh>
 #include <events/netlink-uevent.hh>
 
-namespace
-{
-    const std::string GenesisVersion = "0.1alpha0";
-}
 
 int main(int argc, char * argv[])
 {

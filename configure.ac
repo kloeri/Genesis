@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([genesis], [0.0], [http://bugs.exherbo.org])
+AC_INIT([genesis], [0.1alpha0], [http://bugs.exherbo.org])
 
 AC_CONFIG_SRCDIR([src/genesis.cc])
 AC_CONFIG_MACRO_DIR([m4])
