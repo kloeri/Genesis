@@ -25,6 +25,7 @@
 #include <event-sources/netlink-route.hh>
 #include <event-sources/netlink-uevent.hh>
 
+using namespace genesis;
 
 int main(int argc, char * argv[])
 {

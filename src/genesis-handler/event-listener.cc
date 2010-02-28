@@ -16,37 +16,40 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string>
+#include <memory>
 
-#include <logger.hh>
-#include <actions/action.hh>
+#include "genesis-handler/event-listener.hh"
+#include "genesis-handler/logger.hh"
 
-#include <event-listener.hh>
+#define EVENT_LISTENER          ("Event-Listener")
+
+using namespace genesis;
 
 EventListener::~EventListener(void)
 {
     std::map<int, EventManager *>::iterator manager;
 
-    for (manager = eventmanagers.begin(); manager != eventmanagers.end(); ++manager)
+    for (manager = _managers.begin(); manager != _managers.end(); ++manager)
     {
         delete manager->second;
     }
 }
 
 void
-EventListener::add_eventsource(EventManager * eventmanager)
+EventListener::add_eventsource(EventManager *manager)
 {
-    int fd = eventmanager->get_fd();
-    eventmanagers[fd] = eventmanager;
+    int fd(manager->get_fd());
+    _managers[fd] = manager;
 
     // Grab all 'coldplug' events
-    std::list<std::string> coldplug_events = eventmanager->get_events();
-    eventqueue.splice(eventqueue.end(), coldplug_events);
+    std::list<std::string> coldplug_events = manager->get_events();
+    _events.splice(_events.end(), coldplug_events);
 }
 
-void EventListener::add_event(std::string event)
+void
+EventListener::add_event(const std::string & event)
 {
-    eventqueue.push_back(event);
+    _events.push_back(event);
 }
 
 void
@@ -55,26 +58,31 @@ EventListener::listen()
     int maxfd = 0;
     fd_set readfds;
     FD_ZERO(&readfds);
+    std::map<int, EventManager *>::const_iterator manager;
 
-    for (std::map<int, EventManager *>::iterator iter = eventmanagers.begin(); iter != eventmanagers.end(); ++iter)
+    for (manager = _managers.begin(); manager != _managers.end(); ++manager)
     {
-        if (iter->first >= 0)
+        if (manager->first >= 0)
         {
-            FD_SET(iter->first, &readfds);
-            maxfd = iter->first > maxfd ? iter->first : maxfd;
+            FD_SET(manager->first, &readfds);
+            maxfd = std::max(manager->first, maxfd);
         }
     }
-    select(maxfd + 1, &readfds, NULL, NULL, NULL);
-    for (std::map<int, EventManager *>::iterator iter = eventmanagers.begin(); iter != eventmanagers.end(); ++iter)
+
+    ::select(maxfd + 1, &readfds, NULL, NULL, NULL);
+
+    for (manager = _managers.begin(); manager != _managers.end(); ++manager)
     {
-        if FD_ISSET(iter->first, &readfds)
+        if (FD_ISSET(manager->first, &readfds))
         {
-            Action * action = iter->second->GetEvent();
-            if (action != NULL)
+            std::unique_ptr<Action> action(manager->second->GetEvent());
+
+            if (action.get())
             {
+                Logger::get_instance().log(INFO, EVENT_LISTENER, "received action: " + action->Identity());
                 action->Execute();
-                Logger::get_instance().Log(INFO, action->Identity());
-                Logger::get_instance().Log(DEBUG, "Result of Execute(): " + action->GetResult());
+                Logger::get_instance().log(DEBUG, EVENT_LISTENER, "action result: " + action->GetResult());
+
                 send_event(action->Identity());
             }
         }
@@ -82,36 +90,46 @@ EventListener::listen()
 }
 
 void
-EventListener::process_eventqueue()
+EventListener::process_eventqueue(void)
 {
-    for (std::list<std::string>::iterator event = eventqueue.begin(); event != eventqueue.end(); ++event)
+    std::list<std::string>::const_iterator event;
+    std::map<int, EventManager *>::const_iterator manager;
+
+    for (event = _events.begin(); event != _events.end(); ++event)
     {
-        for (std::map<int, EventManager *>::iterator iter = eventmanagers.begin(); iter != eventmanagers.end(); ++iter)
+        for (manager = _managers.begin(); manager != _managers.end(); ++manager)
         {
-            Action * action = iter->second->new_event(*event);
-            if (action != NULL)
+            std::unique_ptr<Action> action(manager->second->new_event(*event));
+
+            if (action.get())
             {
+                Logger::get_instance().log(INFO, EVENT_LISTENER, "received action: " + action->Identity());
                 action->Execute();
-                Logger::get_instance().Log(INFO, action->Identity());
-                Logger::get_instance().Log(DEBUG, "Result of Execute(): " + action->GetResult());
+                Logger::get_instance().log(DEBUG, EVENT_LISTENER, "action result: " + action->GetResult());
+
                 send_event(action->Identity());
             }
         }
     }
-    eventqueue.clear();
+
+    _events.clear();
 }
 
 void
-EventListener::send_event(std::string event)
+EventListener::send_event(const std::string & event)
 {
-    for (std::map<int, EventManager *>::iterator iter = eventmanagers.begin(); iter != eventmanagers.end(); ++iter)
+    std::map<int, EventManager *>::const_iterator manager;
+
+    for (manager = _managers.begin(); manager != _managers.end(); ++manager)
     {
-        Action * action = iter->second->new_event(event);
-        if (action != NULL)
+        std::unique_ptr<Action> action(manager->second->new_event(event));
+
+        if (action.get())
         {
+            Logger::get_instance().log(INFO, EVENT_LISTENER, "received action: " + action->Identity());
             action->Execute();
-            Logger::get_instance().Log(INFO, action->Identity());
-            Logger::get_instance().Log(DEBUG, "Result of Execute(): " + action->GetResult());
+            Logger::get_instance().log(DEBUG, EVENT_LISTENER, "action result: " + action->GetResult());
+
             send_event(action->Identity());
         }
     }

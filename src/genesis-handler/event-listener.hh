@@ -20,26 +20,30 @@
 #define SRC_GENESIS_HANDLER_EVENT_LISTENER_HH
 
 #include <map>
+#include <list>
 #include <string>
 
-#include <events/event.hh>
+#include "event-sources/event.hh"
 
-class EventListener
+namespace genesis
 {
-    private:
-        std::map<int, EventManager *> eventmanagers;
-        std::list<std::string> eventqueue;
+    class EventListener
+    {
+        private:
+            std::map<int, EventManager *> _managers;
+            std::list<std::string> _events;
 
-        void send_event(std::string event);
+            void send_event(const std::string & event);
 
-    public:
-        ~EventListener(void);
+        public:
+            ~EventListener(void);
 
-        void add_eventsource(EventManager * eventmanager);
-        void add_event(std::string event);
-        void listen();
-        void process_eventqueue();
-};
+            void add_eventsource(EventManager *manager);
+            void add_event(const std::string & event);
+            void listen(void);
+            void process_eventqueue(void);
+    };
+}
 
 #endif
 
