@@ -24,16 +24,30 @@
 #define EVENT_LISTENER          ("Event-Listener")
 
 using namespace genesis;
+using namespace genesis::events;
 using namespace genesis::logging;
 
 EventListener::~EventListener(void)
 {
     std::map<int, EventManager *>::iterator manager;
+    std::map<int, EventSource *>::iterator source;
 
     for (manager = _managers.begin(); manager != _managers.end(); ++manager)
     {
         delete manager->second;
     }
+
+    for (source = _sources.begin(); source != _sources.end(); ++source)
+    {
+        delete source->second;
+    }
+}
+
+void
+EventListener::add_source(EventSource *source)
+{
+    int fd(source->fd());
+    _sources[fd] = source;
 }
 
 void
@@ -60,12 +74,22 @@ EventListener::listen()
     fd_set readfds;
     FD_ZERO(&readfds);
     std::map<int, EventManager *>::const_iterator manager;
+    std::map<int, EventSource *>::const_iterator source;
 
     for (manager = _managers.begin(); manager != _managers.end(); ++manager)
     {
         if (manager->first >= 0)
         {
             FD_SET(manager->first, &readfds);
+            maxfd = std::max(manager->first, maxfd);
+        }
+    }
+
+    for (source = _sources.begin(); source != _sources.end(); ++source)
+    {
+        if (source->first >= 0)
+        {
+            FD_SET(source->first, &readfds);
             maxfd = std::max(manager->first, maxfd);
         }
     }
@@ -77,6 +101,23 @@ EventListener::listen()
         if (FD_ISSET(manager->first, &readfds))
         {
             std::unique_ptr<Action> action(manager->second->GetEvent());
+
+            if (action.get())
+            {
+                Log::get_instance().log(INFO, EVENT_LISTENER, "received action: " + action->Identity());
+                action->Execute();
+                Log::get_instance().log(DEBUG, EVENT_LISTENER, "action result: " + action->GetResult());
+
+                send_event(action->Identity());
+            }
+        }
+    }
+
+    for (source = _sources.begin(); source != _sources.end(); ++source)
+    {
+        if (FD_ISSET(source->first, &readfds))
+        {
+            std::unique_ptr<Action> action(source->second->process_event());
 
             if (action.get())
             {
@@ -120,6 +161,7 @@ void
 EventListener::send_event(const std::string & event)
 {
     std::map<int, EventManager *>::const_iterator manager;
+    std::map<int, EventSource *>::const_iterator source;
 
     for (manager = _managers.begin(); manager != _managers.end(); ++manager)
     {
@@ -133,6 +175,11 @@ EventListener::send_event(const std::string & event)
 
             send_event(action->Identity());
         }
+    }
+
+    for (source = _sources.begin(); source != _sources.end(); ++source)
+    {
+        source->second->event_processed(event);
     }
 }
 

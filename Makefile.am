@@ -33,8 +33,10 @@ src_actions_libaction_la_SOURCES = src/actions/action.hh         \
 src_actions_libaction_la_LIBADD = src/util/libutil.la
 
 src_event_sources_libevent_sources_la_SOURCES = src/event-sources/events.hh         \
-						src/event-sources/genesis-fifo.cc   \
-						src/event-sources/genesis-fifo.hh   \
+						src/event-sources/event-source.cc   \
+						src/event-sources/event-source.hh   \
+						src/event-sources/genesis-pipe.cc   \
+						src/event-sources/genesis-pipe.hh   \
 						src/event-sources/netlink-route.cc  \
 						src/event-sources/netlink-route.hh  \
 						src/event-sources/netlink-uevent.cc \

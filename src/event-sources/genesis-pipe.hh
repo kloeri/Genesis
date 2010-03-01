@@ -1,6 +1,6 @@
 /* vim: set sw=4 sts=4 et foldmethod=syntax : */
 /*
- * Copyright (c) 2010 Bryan Østergaard
+ * Copyright © 2010 Bryan Østergaard
  *
  * This file is part of the Genesis initsystem. Genesis is free software;
  * you can redistribute it and/or modify it under the terms of the GNU General
@@ -16,37 +16,30 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef SRC_GENESIS_HANDLER_EVENT_LISTENER_HH
-#define SRC_GENESIS_HANDLER_EVENT_LISTENER_HH
+#ifndef SRC_EVENT_SOURCES_GENESIS_PIPE_HH
+#define SRC_EVENT_SOURCES_GENESIS_PIPE_HH
 
-#include <map>
-#include <list>
 #include <string>
 
-#include "event-sources/event.hh"
 #include "event-sources/event-source.hh"
 
 namespace genesis
 {
-    class EventListener
+    namespace events
     {
-        private:
-            std::map<int, EventManager *> _managers;
-            std::map<int, genesis::events::EventSource *> _sources;
-            std::list<std::string> _events;
+        class GenesisPipe
+            : public EventSource
+        {
+            public:
+                static const std::string Name;
 
-            void send_event(const std::string & event);
+                GenesisPipe(void);
+                ~GenesisPipe(void);
 
-        public:
-            ~EventListener(void);
-
-            void add_source(genesis::events::EventSource *source);
-
-            void add_eventsource(EventManager *manager);
-            void add_event(const std::string & event);
-            void listen(void);
-            void process_eventqueue(void);
-    };
+                virtual std::unique_ptr<Action> process_event(void);
+                virtual void event_processed(const std::string & event);
+        };
+    }
 }
 
 #endif

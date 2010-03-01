@@ -21,12 +21,14 @@
 
 #include "util/log.hh"
 
-#include <event-sources/genesis-fifo.hh>
 #include <event-sources/netlink-route.hh>
 #include <event-sources/netlink-uevent.hh>
+
+#include "event-sources/genesis-pipe.hh"
 #include "genesis-handler/event-listener.hh"
 
 using namespace genesis;
+using namespace genesis::events;
 using namespace genesis::logging;
 
 int main(int argc, char * argv[])
@@ -38,7 +40,8 @@ int main(int argc, char * argv[])
 
     log.set_minimum_log_level(DEBUG);
 
-    listener.add_eventsource(new GenesisFIFO());
+    listener.add_source(new GenesisPipe);
+
     listener.add_eventsource(new NetlinkUevent());
     listener.add_eventsource(new NetlinkRoute());
     listener.add_event("genesis-initialising");
