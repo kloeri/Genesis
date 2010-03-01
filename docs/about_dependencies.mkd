@@ -1,0 +1,194 @@
+Why dependencies aren't everything
+==================================
+
+What dependencies represent in traditional systems
+-------------------------------------------------
+In traditional systems like Gentoos baselayout dependencies are a way to
+specify required state of other scripts. So the apache2 script can require
+that networking is script 'running'. The initsystem handles this simply by
+running the 'start' function of the network script and (assuming no errors)
+the network script is now in 'running' state and the apache2 start() function
+can be called.
+
+Similarly the apache2 stop() function needs to be called before the network
+stop() function so the scripts can return to 'stopped' state in the correct
+order.
+
+This works very well most of the time and it's somewhat rare to have
+dependencies you can't easily express in this simple system.
+
+What dependencies represent in event based systems
+--------------------------------------------------
+In a purely event based system (like most event sources in Genesis) scripts
+are only called on specific events. So they 'subscribe' to a set of events
+that they want to handle and bash functions are called according to those
+events.
+
+Dependencies describe the order we want to handle events in.
+
+What dependencies really represent in event based systems part I
+----------------------------------------------------------------
+Event dependencies really says which order events are supposed to happen in -
+something that many event sources have no control over.
+
+What dependencies really represent in event based systems part II
+-----------------------------------------------------------------
+Event dependencies _really_ is a way of scriptA controlling when to run
+scriptB in a limited, half-assed way. It can only make sure that scriptB is
+run when scriptA wants it to but we have no say over other times scriptB might
+be run.
+
+And we even have no control over when _not_ to run scriptB as the events
+subscribed to by scriptB can happen at any time. We could add blocking
+dependencies to solve this particular problem but this complicates things
+slightly and we'd gain very little from it (due to other problems).
+
+It's no longer a purely event based system
+------------------------------------------
+As long as we try to implement dependencies directly in Genesis we're going to
+have two different ways of running scripts. Either due to a normal event or
+due to a dependency.
+
+It clutters the model quite a bit but this problem is somewhat easily solved.
+
+Dependencies implies state
+--------------------------
+Any kind of dependency system in initscripts automatically implies keeping
+track of state. You want to be able to say "make sure that scriptA is running
+before running scriptB". But most event sources really want to avoid state
+tracking if possible. Not because it's hard to keep track of from Genesis'
+side but because it's hard to define from the scripts side. Most/many scripts
+will just react to simple events but isn't really going to have any kind of
+state.
+
+What state would a script be in after being triggered by a new IP address
+being set on a network interface? Would it be 'default', 'hasalreadyrun',
+'running', 'stopped', 'setup' or some other state? And does any of those
+states imply whether we can trigger a script when removing the IP address?
+It's a good bit harder answering those questions in a purely event oriented
+system than traditional systems and actual state information isn't neccessary
+in many cases.
+
+Dependencies moves responsibility from one script to multiple scripts
+---------------------------------------------------------------------
+By adding dependencies we add an additional responsibility of making sure
+scripts are run at specific points. But the responsibility is not added to the
+script we want to control but to various other scripts. Control of the script
+becomes distributed in this way (the script itself subscribes to some events
+and random other scripts also specify events that requires the script to run).
+
+A partial solution?
+-------------------
+One possible way of getting rid of dependencies but still getting most of what
+we want from dependencies is to specify events to be emitted before a script
+runs (and possibly after it finishes running as well).
+
+This way we:
+1. Split the dependency in two - one being event subscription and the other
+being emitting the event.
+2. We make sure that everything is handled on an event basis. Subscribing to
+events is the only way scripts can be run under this scheme.
+3. Get the ordering control we want from dependencies.
+
+This model makes sure that all scripts are run based on real events and it
+also partly makes sure responsibility stays in the script as there's only one
+place to describe events it wants to be run on.
+
+What it doesn't do is remove the ordering attempt. We still try to
+artificially control the order events happens in. And it does nothing at all
+to help handle the complexity of emitting events.
+
+Most (all?) events will have more or less complex data like interface name,
+interface type and speed and so on for an event describing a new network
+interface coming up. How are we going to handle that problem when saying "emit
+events A, B and C before running me"?
+
+Another partial solution
+------------------------
+We split the dependency in two like in the first solution. But instead of
+emitting the required events right away we accumulate events until the
+requirements can be fulfilled and only then will Genesis run the scripts (in
+the correct order of course).
+
+This has an astounding number of stupid problems of course and I can't see it
+being implemented at all.
+
+You might have several dependency chains involving some of the same events so
+you can't discard the events after running the scripts or you'd break the
+other dependency chains.
+
+You'll also get a completely unspecified delay in many cases as you wait for
+events to (hopefully) occur. And you'd had to keep track of which dependency
+chains have already "used" an event. You'd probably end up with some kind of
+reference counting or other stupid mess to control all this and gain next to
+nothing.
+
+Generally speaking this "solution" would only result in a far bigger mess and
+more problems even though parts of it can be handled slightly nicer than I've
+described here.
+
+Any solution is going to cause some new problems
+------------------------------------------------
+If we decide on some way of emulating dependencies or another way of
+controlling the order of events we're going to get a couple new challenges.
+
+The biggest challenge is probably going to adjust ourselves to a very
+different way of handling these issues than we're used to from other
+initsystems.
+
+A solution in search of a problem?
+----------------------------------
+I suspect that ordering problems are impossible in most cases. You can't set
+an IP address on a network interface before the interface exists for example.
+Likewise you're guaranteed that the IP address is removed before the interface
+disappears except for exceptional cases like the driver crashing. I can't see
+us handling such a case sanely though under any circumstances. What should we
+do when the network driver crashes? The only sane option is probably ignoring
+it as we can't (generally) know how much damage is caused by the crash and
+what commands can be run related to the interface. Trying to handle such a
+case is likely to hang the system completely and in most cases I think it's
+best to simply ignore it and let the administrator handle things manually
+instead.
+
+So what types of events might come in the wrong order? At the moment I only
+see user emitted events being a problem. I can't think of any cases where the
+kernel would emit events in a different order than we'd want and I suspect the
+same is true for any other event subsystem we might add to Genesis in the
+future.
+
+If we add a hypothetical Apache httpd event subsystem I'd expect that the
+"Apache is started" event would come before any "Page blah requested" events.
+And even if there should be a race condition involved I can't see that being a
+real problem.
+
+And as for user emitted events we'd want to control what can be emitted in any
+case. It doesn't make too much sense for a user to emit the "new network
+interface added" event for example. So it's a different type of events that
+users would want to emit. More specifically, it would be the type of events
+that can be more or less directly translated to the start/stop events of
+running init.d scripts in baselayout. An apache2 script would still need to
+know that the network is up and running but I believe that can be better
+handled by having a way to inquire network status than by using dependency
+like systems.
+
+How Genesis solves it
+---------------------
+In Genesis we solve the above problems by letting each event source decide
+what functionality it exposes to scripts. This means that we can have
+different event sources working in completely different ways.
+
+Some event sources might have some sort of dependencies. Other event sources
+only have subscriptions and no concept of dependencies. And yet other event
+sources might have ways of specifying how to generate events in the scripts.
+
+We already have a couple purely event based sources with little knowledge of
+dependencies. Netlink-uevent and Netlink-route are both examples of this.
+
+The Genesis FIFO command source is an example of a completely event driven
+system with no script interface at all. All events are triggered by writing to
+/dev/genesis.
+
+A future event source will act much like traditional init systems and support
+dependencies so it's possible to secure that networking is configured before
+starting a webserver for instance. Events will in this case always be
+triggered by a user wanting to start or stop a service.

@@ -1,0 +1,36 @@
+Genesis - The 10.000 feet view
+==============================
+
+General architecture
+--------------------
+Genesis is a general event processing system also useful as an init system.
+
+Genesis has several event sources, each event source handling a specific type
+or class of events. Events are then matched against 'subscriptions' specific to
+that event source and passed back to the main loop as actions to be performed.
+
+The main process sets up all the event sources and then starts processing first
+any coldplug events from the initialisation and then any events happening after
+that.
+
+Scripts
+-------
+After any script Genesis emits a 'post' event when the script finishes. This
+event is broadcast to all event sources and can be used to 'chain' triggering
+scripts.
+
+Scripts generally consists of (might differ for some event sources):
+* A list of events that it wants to subscribe to
+* The bash function(s) that's run when any of those events are received
+
+Event subscriptions depend on the event source but for netlink-uevent and
+netlink-route it's specified using a regex to match the serialized metadata for
+the event(s) in question.
+
+The specific format is:
+SUBSCRIPTIONS_function=event_regex
+
+where function specifics the function to run and event_regex matches the serialized data format.
+
+All the information related to the specific event are passed to the bash
+function as environment variables.
