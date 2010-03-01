@@ -22,8 +22,8 @@
 
 #include <list>
 #include <utility>
-#include <config.hh>
 #include <event-sources/event.hh>
+#include "genesis-handler/config.hh"
 
 class NetlinkUevent : public EventManager
 {

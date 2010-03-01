@@ -21,7 +21,7 @@
 #include <fstream>
 #include <pcre++.h>
 
-#include <config.hh>
+#include "genesis-handler/config.hh"
 
 Configuration::Configuration(std::string conffile, std::string sectionname)
 {

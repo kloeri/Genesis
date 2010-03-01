@@ -21,13 +21,18 @@
 #include <iostream>
 #include <string>
 #include "genesis-action.hh"
-#include <logger.hh>
+
+#include "util/log.hh"
+
+#define GENESIS_ACTION          ("Genesis-Action")
+
+using namespace genesis::logging;
 
 void GenesisAction::Execute()
 {
     if (command == "exit")
     {
-        Logger::get_instance().Log(INFO, "Genesis received exit command.");
+        Log::get_instance().log(INFO, GENESIS_ACTION, "Genesis received exit command.");
         exit(0);
     }
 }

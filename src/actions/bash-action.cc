@@ -19,8 +19,9 @@
 
 #include <iostream>
 #include <string>
-#include <bash.hh>
-#include "bash-action.hh"
+
+#include "actions/bash-action.hh"
+#include "genesis-handler/bash.hh"
 
 void BashAction::Execute()
 {

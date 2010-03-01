@@ -22,8 +22,12 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#include <bash.hh>
-#include <logger.hh>
+#include "util/log.hh"
+#include "genesis-handler/bash.hh"
+
+#define BASH    ("bash")
+
+using namespace genesis::logging;
 
 char ** charptrarray(const std::vector<std::string> & env)
 {
@@ -85,7 +89,7 @@ std::string GetMetadata(const std::string & file)
             }
             else
             {
-                Logger::get_instance().Log(ERR, "Child exited abnormally.");
+                Log::get_instance().log(ERR, BASH, "Child exited abnormally.");
             }
     }
     return std::string();
@@ -144,7 +148,7 @@ std::string RunBashFunction(const std::string & file, const std::string & functi
             }
             else
             {
-                Logger::get_instance().Log(ERR, "Child exited abnormally.");
+                Log::get_instance().log(ERR, BASH, "Child exited abnormally.");
             }
     }
     return std::string();

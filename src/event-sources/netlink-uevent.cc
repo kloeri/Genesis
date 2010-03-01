@@ -34,11 +34,14 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 
-#include <bash.hh>
-#include <config.hh>
-#include <logger.hh>
+#include "util/log.hh"
+#include "genesis-handler/config.hh"
 #include <event-sources/netlink-uevent.hh>
 #include <actions/bash-action.hh>
+
+#define NETLINK_UEVENT ("netlink-uevent")
+
+using namespace genesis::logging;
 
 namespace
 {
@@ -129,7 +132,7 @@ NetlinkUevent::NetlinkUevent()
 
     if (UEventConfiguration->get_option("coldplug") == "yes")
     {
-        Logger::get_instance().Log(DEBUG, "Generating coldplug events..");
+        Log::get_instance().log(DEBUG, NETLINK_UEVENT, "Generating coldplug events..");
         GenerateEvents();
     }
 
@@ -168,7 +171,7 @@ void NetlinkUevent::SourceScripts(std::string path)
                     int delimiter = line.find(", ");
                     std::string function(line.substr(0, delimiter));
                     std::string match(line.substr(delimiter + 2, line.size()));
-                    Logger::get_instance().Log(DEBUG, "NetlinkUevent::SourceScripts adding event: " + match);
+                    Log::get_instance().log(DEBUG, NETLINK_UEVENT, "NetlinkUevent::SourceScripts adding event: " + match);
                     eventsubscriptions.push_back(eventhandler(scriptfile, function, pcrepp::Pcre(match)));
                 }
             }
@@ -176,7 +179,7 @@ void NetlinkUevent::SourceScripts(std::string path)
     }
     else
     {
-        Logger::get_instance().Log(ERR, "netlink-uevent: Couldn't open the directory '" + path + "'");
+        Log::get_instance().log(ERR, NETLINK_UEVENT, "Couldn't open the directory '" + path + "'");
     }
 }
 

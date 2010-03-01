@@ -26,7 +26,12 @@
 #include <cerrno>
 #include <event-sources/genesis-fifo.hh>
 #include <actions/genesis-action.hh>
-#include <genesis-handler/logger.hh>
+
+#include "util/log.hh"
+
+#define GENESIS_FIFO        ("genesis-fifo")
+
+using namespace genesis::logging;
 
 GenesisFIFO::GenesisFIFO()
 {
@@ -37,7 +42,7 @@ GenesisFIFO::GenesisFIFO()
     err = ::mkfifo("/dev/genesis", 0666);
     if (err)
     {
-        Logger::get_instance().Log(ERR, "genesis-fifo: failed to create FIFO: " + std::string(::strerror(errno)));
+        Log::get_instance().log(ERR, GENESIS_FIFO, "failed to create FIFO: " + std::string(::strerror(errno)));
         return;
     }
 

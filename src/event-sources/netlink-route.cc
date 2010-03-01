@@ -30,9 +30,13 @@
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 
-#include <logger.hh>
+#include "util/log.hh"
 #include <event-sources/netlink-route.hh>
 #include <actions/bash-action.hh>
+
+#define _NETLINK_ROUTE               ("netlink-route")
+
+using namespace genesis::logging;
 
 namespace
 {
@@ -89,7 +93,7 @@ void NetlinkRoute::SourceScripts(std::string path)
     }
     else
     {
-        Logger::get_instance().Log(ERR, "netlink-route: Couldn't open the directory '" + path + "'");
+        Log::get_instance().log(ERR, _NETLINK_ROUTE, "Couldn't open the directory '" + path + "'");
     }
 }
 

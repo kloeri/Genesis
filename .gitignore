@@ -30,4 +30,5 @@ Makefile.in
 /src/event-sources/.dirstamp
 /src/genesis-handler/.dirstamp
 /src/genesis-handler/genesis-handler
+/src/util/.dirstamp
 

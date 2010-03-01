@@ -19,11 +19,12 @@
 #include <memory>
 
 #include "genesis-handler/event-listener.hh"
-#include "genesis-handler/logger.hh"
+#include "util/log.hh"
 
 #define EVENT_LISTENER          ("Event-Listener")
 
 using namespace genesis;
+using namespace genesis::logging;
 
 EventListener::~EventListener(void)
 {
@@ -79,9 +80,9 @@ EventListener::listen()
 
             if (action.get())
             {
-                Logger::get_instance().log(INFO, EVENT_LISTENER, "received action: " + action->Identity());
+                Log::get_instance().log(INFO, EVENT_LISTENER, "received action: " + action->Identity());
                 action->Execute();
-                Logger::get_instance().log(DEBUG, EVENT_LISTENER, "action result: " + action->GetResult());
+                Log::get_instance().log(DEBUG, EVENT_LISTENER, "action result: " + action->GetResult());
 
                 send_event(action->Identity());
             }
@@ -103,9 +104,9 @@ EventListener::process_eventqueue(void)
 
             if (action.get())
             {
-                Logger::get_instance().log(INFO, EVENT_LISTENER, "received action: " + action->Identity());
+                Log::get_instance().log(INFO, EVENT_LISTENER, "received action: " + action->Identity());
                 action->Execute();
-                Logger::get_instance().log(DEBUG, EVENT_LISTENER, "action result: " + action->GetResult());
+                Log::get_instance().log(DEBUG, EVENT_LISTENER, "action result: " + action->GetResult());
 
                 send_event(action->Identity());
             }
@@ -126,9 +127,9 @@ EventListener::send_event(const std::string & event)
 
         if (action.get())
         {
-            Logger::get_instance().log(INFO, EVENT_LISTENER, "received action: " + action->Identity());
+            Log::get_instance().log(INFO, EVENT_LISTENER, "received action: " + action->Identity());
             action->Execute();
-            Logger::get_instance().log(DEBUG, EVENT_LISTENER, "action result: " + action->GetResult());
+            Log::get_instance().log(DEBUG, EVENT_LISTENER, "action result: " + action->GetResult());
 
             send_event(action->Identity());
         }
