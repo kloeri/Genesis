@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <cstdio>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 
@@ -102,15 +103,15 @@ std::string RunBashFunction(const std::string & file, const std::string & functi
     int mystderr[2];
 
     // Open pipes
-    if (pipe(mystdin) == -1)
+    if (pipe2(mystdin, O_NONBLOCK) == -1)
     {
         std::perror("pipe");
     }
-    if (pipe(mystdout) == -1)
+    if (pipe2(mystdout, O_NONBLOCK) == -1)
     {
         std::perror("pipe");
     }
-    if (pipe(mystderr) == -1)
+    if (pipe2(mystderr, O_NONBLOCK) == -1)
     {
         std::perror("pipe");
     }
@@ -141,7 +142,7 @@ std::string RunBashFunction(const std::string & file, const std::string & functi
 
             if (WIFEXITED(status))
             {
-                char buf[4096];
+                char buf[4096] = { '\0' };
                 ssize_t size = read(mystdout[0], buf, 4096);
                 buf[size] = 0;
                 return std::string(buf);
