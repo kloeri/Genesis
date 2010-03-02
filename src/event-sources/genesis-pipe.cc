@@ -81,7 +81,11 @@ GenesisPipe::process_event(void)
     ssize_t length;
 
     length = ::read(_fd, &buffer, sizeof(buffer));
+    // Make sure to terminate the char * string
     buffer[length] = '\0';
+    // And kill any newline..
+    if (buffer[length - 1] == '\n')
+            buffer[length - 1] = '\0';
 
     if (strcmp(buffer, "exit") == 0)
         return std::unique_ptr<Action>(new GenesisAction("exit"));
