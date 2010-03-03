@@ -31,6 +31,10 @@ General/core Genesis hacking
 - Fix bash env settings (PATH, shopts and whatever else is needed)
 - Go through the code and cleanup/fix all the small things that makes things explode
 
+Bugs
+- Fix fd leak that causes genesis to run out of fds after a fairly small amounts of actions have been triggered
+	easy to reproduce using SUBSCRIPTIONS_foo=a or similar nonsense
+
 Tests
 - There's currently no tests at all. This needs to be fixed
 
