@@ -30,6 +30,7 @@ General/core Genesis hacking
 - Remove the pcre++ dependency and replace all the regex stuff with a small language for matching event metadata
 - Fix bash env settings (PATH, shopts and whatever else is needed)
 - Go through the code and cleanup/fix all the small things that makes things explode
+- Write a (masked) genesis exheres
 
 Bugs
 - Fix fd leak that causes genesis to run out of fds after a fairly small amounts of actions have been triggered
