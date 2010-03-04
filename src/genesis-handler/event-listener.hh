@@ -35,8 +35,6 @@ namespace genesis
             std::map<int, genesis::events::EventSource *> _sources;
             std::list<std::string> _events;
 
-            void send_event(const std::string & event);
-
         public:
             ~EventListener(void);
 

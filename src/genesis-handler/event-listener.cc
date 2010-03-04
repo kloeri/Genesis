@@ -108,7 +108,7 @@ EventListener::listen()
                 action->Execute();
                 Log::get_instance().log(DEBUG, EVENT_LISTENER, "action result: " + action->GetResult());
 
-                send_event(action->Identity());
+                _events.push_back(action->Identity());
             }
         }
     }
@@ -125,7 +125,7 @@ EventListener::listen()
                 action->Execute();
                 Log::get_instance().log(DEBUG, EVENT_LISTENER, "action result: " + action->GetResult());
 
-                send_event(action->Identity());
+                _events.push_back(action->Identity());
             }
         }
     }
@@ -149,37 +149,11 @@ EventListener::process_eventqueue(void)
                 action->Execute();
                 Log::get_instance().log(DEBUG, EVENT_LISTENER, "action result: " + action->GetResult());
 
-                send_event(action->Identity());
+                _events.push_back(action->Identity());
             }
         }
     }
 
     _events.clear();
-}
-
-void
-EventListener::send_event(const std::string & event)
-{
-    std::map<int, EventManager *>::const_iterator manager;
-    std::map<int, EventSource *>::const_iterator source;
-
-    for (manager = _managers.begin(); manager != _managers.end(); ++manager)
-    {
-        std::unique_ptr<Action> action(manager->second->new_event(event));
-
-        if (action.get())
-        {
-            Log::get_instance().log(INFO, EVENT_LISTENER, "received action: " + action->Identity());
-            action->Execute();
-            Log::get_instance().log(DEBUG, EVENT_LISTENER, "action result: " + action->GetResult());
-
-            send_event(action->Identity());
-        }
-    }
-
-    for (source = _sources.begin(); source != _sources.end(); ++source)
-    {
-        source->second->event_processed(event);
-    }
 }
 
