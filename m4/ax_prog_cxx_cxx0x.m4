@@ -23,6 +23,8 @@ check_type&& cr = c;
 dnl AX_PROG_CXX_CXX0X(ACTION-IF-FOUND, ACTION-IF-NOT-FOUND)
 AC_DEFUN([AX_PROG_CXX_CXX0X],
          [
+            AC_REQUIRE([AC_PROG_CXX])
+
             AC_CACHE_CHECK(if $CXX supports C++0x features without additional flags,
                            ac_cv_cxx_compile_cxx0x_native,
                            [
