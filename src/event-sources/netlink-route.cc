@@ -1,5 +1,4 @@
 /* vim: set sw=4 sts=4 et foldmethod=syntax : */
-
 /*
  * Copyright (c) 2010 Bryan Østergaard
  *
@@ -31,11 +30,13 @@
 #include <linux/rtnetlink.h>
 
 #include "util/log.hh"
+#include "util/tokenise.hh"
 #include <event-sources/netlink-route.hh>
 #include <actions/bash-action.hh>
 
 #define _NETLINK_ROUTE               ("netlink-route")
 
+using namespace genesis::util;
 using namespace genesis::logging;
 
 namespace
@@ -514,8 +515,7 @@ Action * NetlinkRoute::ProcessEvent(std::string event)
     {
         if (iter->match.search(event))
         {
-            pcrepp::Pcre splitregex(";", "g");
-            return new BashAction("run-function", iter->filename, iter->function, splitregex.split(event));
+            return new BashAction("run-function", iter->filename, iter->function, tokenise(event, ";"));
         }
     }
     return 0;
