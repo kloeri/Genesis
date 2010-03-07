@@ -47,7 +47,7 @@ int main(int argc, char * argv[])
     listener.add_event("genesis-initialising");
     listener.add_event("genesis-started");
 
-    while (true)
+    while (! listener.terminate())
     {
         listener.process_eventqueue();
         listener.listen();

@@ -27,6 +27,11 @@ using namespace genesis;
 using namespace genesis::events;
 using namespace genesis::logging;
 
+EventListener::EventListener(void)
+    : _terminate(false)
+{
+}
+
 EventListener::~EventListener(void)
 {
     std::map<int, EventManager *>::iterator manager;
@@ -155,5 +160,17 @@ EventListener::process_eventqueue(void)
     }
 
     _events.clear();
+}
+
+bool
+EventListener::terminate(void) const
+{
+    return _terminate;
+}
+
+void
+EventListener::terminate(const bool value)
+{
+    _terminate = value;
 }
 

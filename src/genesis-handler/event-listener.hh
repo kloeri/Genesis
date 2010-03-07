@@ -23,19 +23,23 @@
 #include <list>
 #include <string>
 
+#include "util/singleton.hh"
 #include "event-sources/event.hh"
 #include "event-sources/event-source.hh"
 
 namespace genesis
 {
     class EventListener
+        : public Singleton<EventListener>
     {
         private:
+            bool _terminate;
             std::map<int, EventManager *> _managers;
             std::map<int, genesis::events::EventSource *> _sources;
             std::list<std::string> _events;
 
         public:
+            EventListener(void);
             ~EventListener(void);
 
             void add_source(genesis::events::EventSource *source);
@@ -44,6 +48,9 @@ namespace genesis
             void add_event(const std::string & event);
             void listen(void);
             void process_eventqueue(void);
+
+            bool terminate(void) const;
+            void terminate(const bool terminate);
     };
 }
 

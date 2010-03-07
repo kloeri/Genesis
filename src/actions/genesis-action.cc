@@ -23,9 +23,11 @@
 #include "genesis-action.hh"
 
 #include "util/log.hh"
+#include "genesis-handler/event-listener.hh"
 
 #define GENESIS_ACTION          ("Genesis-Action")
 
+using namespace genesis;
 using namespace genesis::logging;
 
 void GenesisAction::Execute()
@@ -33,7 +35,7 @@ void GenesisAction::Execute()
     if (command == "exit")
     {
         Log::get_instance().log(INFO, GENESIS_ACTION, "Genesis received exit command.");
-        exit(0);
+        EventListener::get_instance().terminate(true);
     }
 }
 
