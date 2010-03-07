@@ -7,7 +7,9 @@ AM_CPPFLAGS = -Werror -Wall                           \
 	      -DSYSCONFDIR=\"${sysconfdir}/genesis/\" \
 	      -DLIBEXECDIR=\"${libexecdir}/genesis/\"
 
-sbin_PROGRAMS = src/genesis-handler/genesis-handler
+sbin_PROGRAMS = src/genesis-handler/genesis-handler \
+		src/genesis/genesis                 \
+		$(NULL)
 
 noinst_LTLIBRARIES = src/actions/libaction.la               \
 		     src/event-sources/libevent-sources.la  \
@@ -61,6 +63,15 @@ src_genesis_handler_genesis_handler_SOURCES = src/genesis-handler/bash.cc       
 src_genesis_handler_genesis_handler_CXXFLAGS = $(PCREPLUSPLUS_CFLAGS)
 src_genesis_handler_genesis_handler_LDFLAGS = -all-static $(PCREPLUSPLUS_LIBS)
 src_genesis_handler_genesis_handler_LDADD = src/util/libutil.la src/event-sources/libevent-sources.la
+
+src_genesis_genesis_SOURCES = src/genesis/argument.cc             \
+			      src/genesis/argument.hh             \
+			      src/genesis/command_line.cc         \
+			      src/genesis/command_line.hh         \
+			      src/genesis/genesis.cc              \
+			      src/genesis/genesis_command_line.cc \
+			      src/genesis/genesis_command_line.hh \
+			      $(NULL)
 
 MAINTAINERCLEANFILES = aclocal.m4 ChangeLog config.guess config.sub configure depcomp install-sh ltmain.sh Makefile.in missing
 
