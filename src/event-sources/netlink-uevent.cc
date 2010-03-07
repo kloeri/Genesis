@@ -35,12 +35,14 @@
 #include <sys/stat.h>
 
 #include "util/log.hh"
+#include "util/tokenise.hh"
 #include "genesis-handler/config.hh"
 #include <event-sources/netlink-uevent.hh>
 #include <actions/bash-action.hh>
 
 #define NETLINK_UEVENT ("netlink-uevent")
 
+using namespace genesis::util;
 using namespace genesis::logging;
 
 namespace
@@ -235,8 +237,7 @@ Action * NetlinkUevent::ProcessEvent(std::string event)
     {
         if (iter->match.search(event))
         {
-            pcrepp::Pcre splitregex(";", "g");
-            return new BashAction("run-function", iter->filename, iter->function, splitregex.split(event));
+            return new BashAction("run-function", iter->filename, iter->function, tokenise(event, ";"));
         }
     }
     return 0;

@@ -21,6 +21,8 @@ src_util_libutil_la_SOURCES = src/util/singleton.hh        \
 			      src/util/log-destination .hh \
 			      src/util/log.cc              \
 			      src/util/log.hh              \
+			      src/util/tokenise.cc         \
+			      src/util/tokenise.hh         \
 			      $(NULL)
 
 src_actions_libaction_la_SOURCES = src/actions/action.hh         \
