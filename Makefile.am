@@ -18,7 +18,7 @@ libexecprogdir = $(libexecdir)/genesis
 libexecprog_SCRIPTS = scripts/*.sh
 
 src_util_libutil_la_SOURCES = src/util/singleton.hh        \
-			      src/util/log-destination .hh \
+			      src/util/log-destinations.hh \
 			      src/util/log.cc              \
 			      src/util/log.hh              \
 			      src/util/tokenise.cc         \
@@ -34,7 +34,7 @@ src_actions_libaction_la_SOURCES = src/actions/action.hh         \
 
 src_actions_libaction_la_LIBADD = src/util/libutil.la
 
-src_event_sources_libevent_sources_la_SOURCES = src/event-sources/events.hh         \
+src_event_sources_libevent_sources_la_SOURCES = src/event-sources/event.hh          \
 						src/event-sources/event-source.cc   \
 						src/event-sources/event-source.hh   \
 						src/event-sources/genesis-pipe.cc   \
