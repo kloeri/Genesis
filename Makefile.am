@@ -17,7 +17,9 @@ noinst_LTLIBRARIES = src/actions/libaction.la               \
 		     $(NULL)
 
 libexecprogdir = $(libexecdir)/genesis
-libexecprog_SCRIPTS = scripts/*.sh
+libexecprog_SCRIPTS = scripts/bash-run.sh       \
+		      scripts/netlink-uevent.sh \
+		      $(NULL)
 
 src_util_libutil_la_SOURCES = src/util/singleton.hh        \
 			      src/util/log-destinations.hh \
@@ -72,6 +74,10 @@ src_genesis_genesis_SOURCES = src/genesis/argument.cc             \
 			      src/genesis/genesis_command_line.cc \
 			      src/genesis/genesis_command_line.hh \
 			      $(NULL)
+
+EXTRA_DIST = scripts/bash-run.sh       \
+	     scripts/netlink-uevent.sh \
+	     $(NULL)
 
 MAINTAINERCLEANFILES = aclocal.m4 ChangeLog config.guess config.sub configure depcomp install-sh ltmain.sh Makefile.in missing
 
