@@ -40,6 +40,9 @@ class BashAction : public Action
         BashAction(std::string command, std::string script)
             : _command(command), _script(script) {}
 
+        // Destruct Action object
+        virtual ~BashAction();
+
         // Perform the action
         void Execute();
 

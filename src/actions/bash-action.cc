@@ -45,3 +45,6 @@ std::string BashAction::Identity()
     return _command + ": " + _script + "->" + _function;
 }
 
+BashAction::~BashAction()
+{
+}
