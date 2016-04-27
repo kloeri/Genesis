@@ -91,7 +91,8 @@ GenesisPipe::process_event(void)
     if (strcmp(buffer, "exit") == 0)
         return std::unique_ptr<Action>(new GenesisAction("exit"));
 
-    return std::unique_ptr<Action>(NULL);
+    //return std::unique_ptr<Action>(NULL);
+    return nullptr;
 }
 
 void
