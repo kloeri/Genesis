@@ -31,6 +31,8 @@ class Action
 
         // Get action parameters for log purpose
         virtual std::string Identity() = 0;
+
+        virtual ~Action() = default;
 };
 
 #endif
