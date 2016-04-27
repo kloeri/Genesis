@@ -27,6 +27,7 @@
 
 #include <cerrno>
 #include <cstring>
+#include <unistd.h>
 
 #define GENESIS_PIPE    ("Genesis-Pipe")
 

@@ -33,6 +33,7 @@
 #include <sys/mount.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include "util/log.hh"
 #include "util/tokenise.hh"
