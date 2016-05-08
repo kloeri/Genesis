@@ -31,6 +31,7 @@
 
 #include "util/log.hh"
 #include "util/tokenise.hh"
+#include "genesis-handler/config.hh"
 #include <event-sources/netlink-route.hh>
 #include <actions/bash-action.hh>
 
@@ -59,6 +60,11 @@ namespace
 //
 NetlinkRoute::NetlinkRoute()
 {
+    std::map<std::string, std::string> defaultconfig;
+    defaultconfig["log_matched_events"] = "no";
+    defaultconfig["log_unmatched_events"] = "yes";
+
+    URouteConfiguration = new Configuration(SYSCONFDIR "config", "netlink-route", defaultconfig);
     SourceScripts(SYSCONFDIR "netlink-route/");
     OpenSocket(PF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE, RTNLGRP_MAX);
 }
@@ -515,8 +521,16 @@ Action * NetlinkRoute::ProcessEvent(std::string event)
     {
         if (iter->match.search(event))
         {
-            return new BashAction("run-function", iter->filename, iter->function, tokenise(event, ";"));
+            if (URouteConfiguration->get_option("log_matched_events") == "yes")
+            {
+                Log::get_instance().log(DEBUG, _NETLINK_ROUTE, "Matched route event: " + event);
+                return new BashAction("run-function", iter->filename, iter->function, tokenise(event, ";"));
+            }
         }
+    }
+    if (URouteConfiguration->get_option("log_unmatched_events") == "yes")
+    {
+        Log::get_instance().log(DEBUG, _NETLINK_ROUTE, "Unmatched route event: " + event);
     }
     return 0;
 }

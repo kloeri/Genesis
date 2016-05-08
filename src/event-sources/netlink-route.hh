@@ -29,10 +29,12 @@
 #include <actions/action.hh>
 #include <event-sources/event.hh>
 #include <pcre++.h>
+#include "genesis-handler/config.hh"
 
 class NetlinkRoute : public EventManager
 {
     private:
+        Configuration * URouteConfiguration;
         int netlinksocket;
         std::list<eventhandler> eventsubscriptions;
 
