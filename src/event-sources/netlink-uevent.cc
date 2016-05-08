@@ -91,7 +91,7 @@ namespace
             if (std::strcmp(entry->d_name + std::strlen(entry->d_name) - 3, ".sh") == 0)
             {
                 return 1;
-            }
+	    }
         }
         return 0;
     }
@@ -237,8 +237,16 @@ Action * NetlinkUevent::ProcessEvent(std::string event)
     {
         if (iter->match.search(event))
         {
+		if (UEventConfiguration->get_option("log_matched_events") == "yes")
+		{
+			Log::get_instance().log(DEBUG, NETLINK_UEVENT, "Matched event: " + event);
+		}
             return new BashAction("run-function", iter->filename, iter->function, tokenise(event, ";"));
         }
+    }
+    if (UEventConfiguration->get_option("log_unmatched_events") == "yes")
+    {
+        Log::get_instance().log(DEBUG, NETLINK_UEVENT, "Unmatched event: " + event);
     }
     return 0;
 }
