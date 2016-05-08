@@ -101,7 +101,7 @@ void NetlinkUevent::GenerateEvents()
 {
     if ((UEventConfiguration->get_option("coldplug") == "yes") && (UEventConfiguration->get_option("coldplug_mounts_sysfs") == "yes"))
     {
-        if (mount("none", "/sys", "sysfs", 9, NULL) == -1)
+        if (mount("none", "/sys", "sysfs", MS_RDONLY | MS_NOEXEC, NULL) == -1)
         {
             std::perror("mount");
         }
