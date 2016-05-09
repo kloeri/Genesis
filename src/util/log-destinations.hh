@@ -85,7 +85,7 @@ namespace genesis
                 int
                 sync(void)
                 {
-                    ::syslog(0, _buffer.str().c_str());
+                    ::syslog(0, "%s", _buffer.str().c_str());
                     _buffer.str("");
                     return 0;
                 }
