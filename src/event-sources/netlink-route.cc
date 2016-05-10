@@ -486,7 +486,7 @@ Action *NetlinkRoute::GetEvent()
 
                 // Neightborhood discovery (ARP)
             case RTM_NEWNEIGH:
-                event_strings << "G_EVENTTYPE=new_neighbor;";
+                event_strings << "G_EVENTTYPE=new_neighbor";
                 struct ndmsg * ndmsg_payload;
                 ndmsg_payload = (struct ndmsg *) NLMSG_DATA(netlink_header);
                 serialize_ndm_family(event_strings, ndmsg_payload->ndm_family);
@@ -496,7 +496,7 @@ Action *NetlinkRoute::GetEvent()
                 event_strings << ";G_TYPE=" << static_cast<int>(ndmsg_payload->ndm_type);
                 break;
             case RTM_DELNEIGH:
-                event_strings << "G_EVENTTYPE=removed_neighbor;";
+                event_strings << "G_EVENTTYPE=removed_neighbor";
                 ndmsg_payload = (struct ndmsg *) NLMSG_DATA(netlink_header);
                 serialize_ndm_family(event_strings, ndmsg_payload->ndm_family);
                 event_strings << ";G_INTERFACE=" << static_cast<int>(ndmsg_payload->ndm_ifindex);
