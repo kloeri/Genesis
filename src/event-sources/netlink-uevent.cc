@@ -233,15 +233,15 @@ Action * NetlinkUevent::ProcessEvent(std::string event)
     if (event.find("change@") != std::string::npos)
         event.replace(event.find("change@"), 7, "G_EVENTTYPE=changedevice;G_DEVICE=");
 
-    for (std::list<eventhandler>::iterator iter = eventsubscriptions.begin(); iter != eventsubscriptions.end(); ++iter)
+    for (auto iter : eventsubscriptions)
     {
-        if (iter->match.search(event))
+        if (iter.match.search(event))
         {
 		if (UEventConfiguration->get_option("log_matched_events") == "yes")
 		{
 			Log::get_instance().log(DEBUG, NETLINK_UEVENT, "Matched event: " + event);
 		}
-            return new BashAction("run-function", iter->filename, iter->function, tokenise(event, ";"));
+            return new BashAction("run-function", iter.filename, iter.function, tokenise(event, ";"));
         }
     }
     if (UEventConfiguration->get_option("log_unmatched_events") == "yes")

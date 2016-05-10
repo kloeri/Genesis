@@ -517,14 +517,14 @@ Action *NetlinkRoute::GetEvent()
 
 Action * NetlinkRoute::ProcessEvent(std::string event)
 {
-    for (std::list<eventhandler>::iterator iter = eventsubscriptions.begin(); iter != eventsubscriptions.end(); ++iter)
+    for (auto iter : eventsubscriptions)
     {
-        if (iter->match.search(event))
+        if (iter.match.search(event))
         {
             if (URouteConfiguration->get_option("log_matched_events") == "yes")
             {
                 Log::get_instance().log(DEBUG, _NETLINK_ROUTE, "Matched route event: " + event);
-                return new BashAction("run-function", iter->filename, iter->function, tokenise(event, ";"));
+                return new BashAction("run-function", iter.filename, iter.function, tokenise(event, ";"));
             }
         }
     }

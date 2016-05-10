@@ -36,9 +36,9 @@ Configuration::Configuration(std::string conffile, std::string sectionname, std:
 void Configuration::Construct(std::string conffile, std::string sectionname, std::map<std::string, std::string> defconfig)
 {
     // Set default configuration
-    for (std::map<std::string,std::string>::iterator iter = defconfig.begin(); iter != defconfig.end(); ++iter)
+    for (auto  iter : defconfig)
     {
-        options[iter->first] = iter->second;
+        options[iter.first] = iter.second;
     }
 
     std::ifstream config(conffile.c_str());

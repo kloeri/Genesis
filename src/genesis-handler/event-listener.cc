@@ -37,14 +37,14 @@ EventListener::~EventListener(void)
     std::map<int, EventManager *>::iterator manager;
     std::map<int, EventSource *>::iterator source;
 
-    for (manager = _managers.begin(); manager != _managers.end(); ++manager)
+    for (auto manager : _managers)
     {
-        delete manager->second;
+        delete manager.second;
     }
 
-    for (source = _sources.begin(); source != _sources.end(); ++source)
+    for (auto source : _sources)
     {
-        delete source->second;
+        delete source.second;
     }
 }
 
@@ -81,31 +81,31 @@ EventListener::listen()
     std::map<int, EventManager *>::const_iterator manager;
     std::map<int, EventSource *>::const_iterator source;
 
-    for (manager = _managers.begin(); manager != _managers.end(); ++manager)
+    for (auto manager : _managers)
     {
-        if (manager->first >= 0)
+        if (manager.first >= 0)
         {
-            FD_SET(manager->first, &readfds);
-            maxfd = std::max(manager->first, maxfd);
+            FD_SET(manager.first, &readfds);
+            maxfd = std::max(manager.first, maxfd);
         }
     }
 
-    for (source = _sources.begin(); source != _sources.end(); ++source)
+    for (auto source : _sources)
     {
-        if (source->first >= 0)
+        if (source.first >= 0)
         {
-            FD_SET(source->first, &readfds);
-            maxfd = std::max(manager->first, maxfd);
+            FD_SET(source.first, &readfds);
+            maxfd = std::max(source.first, maxfd);
         }
     }
 
     ::select(maxfd + 1, &readfds, NULL, NULL, NULL);
 
-    for (manager = _managers.begin(); manager != _managers.end(); ++manager)
+    for (auto manager : _managers)
     {
-        if (FD_ISSET(manager->first, &readfds))
+        if (FD_ISSET(manager.first, &readfds))
         {
-            std::unique_ptr<Action> action(manager->second->GetEvent());
+            std::unique_ptr<Action> action(manager.second->GetEvent());
 
             if (action.get())
             {
@@ -118,11 +118,11 @@ EventListener::listen()
         }
     }
 
-    for (source = _sources.begin(); source != _sources.end(); ++source)
+    for (auto source : _sources)
     {
-        if (FD_ISSET(source->first, &readfds))
+        if (FD_ISSET(source.first, &readfds))
         {
-            std::unique_ptr<Action> action(source->second->process_event());
+            std::unique_ptr<Action> action(source.second->process_event());
 
             if (action.get())
             {
@@ -142,11 +142,11 @@ EventListener::process_eventqueue(void)
     std::list<std::string>::const_iterator event;
     std::map<int, EventManager *>::const_iterator manager;
 
-    for (event = _events.begin(); event != _events.end(); ++event)
+    for (auto event : _events)
     {
-        for (manager = _managers.begin(); manager != _managers.end(); ++manager)
+        for (auto manager : _managers)
         {
-            std::unique_ptr<Action> action(manager->second->new_event(*event));
+            std::unique_ptr<Action> action(manager.second->new_event(event));
 
             if (action.get())
             {
