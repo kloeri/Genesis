@@ -20,6 +20,8 @@
 #ifndef SRC_GUARD_ACTION_HH
 #define SRC_GUARD_ACTION_HH 1
 
+#include <string>
+
 class Action {
 public:
   // Execute action
