@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright (c) 2010 Bryan Østergaard
  *
@@ -16,8 +16,8 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string>
 #include <iostream>
+#include <string>
 
 #include "util/log.hh"
 
@@ -31,26 +31,24 @@ using namespace genesis;
 using namespace genesis::events;
 using namespace genesis::logging;
 
-int main(int argc, char * argv[])
-{
-    Log log;
-    EventListener listener;
+int main(int argc, char *argv[]) {
+  Log log;
+  EventListener listener;
 
-    std::cout << "Genesis (c) 2010 Bryan Østergaard <kloeri@exherbo.org>" << std::endl;
+  std::cout << "Genesis (c) 2010 Bryan Østergaard <kloeri@exherbo.org>"
+            << std::endl;
 
-    log.set_minimum_log_level(DEBUG);
+  log.set_minimum_log_level(DEBUG);
 
-    listener.add_source(new GenesisPipe);
+  listener.add_source(new GenesisPipe);
 
-    listener.add_eventsource(new NetlinkUevent());
-    listener.add_eventsource(new NetlinkRoute());
-    listener.add_event("genesis-initialising");
-    listener.add_event("genesis-started");
+  listener.add_eventsource(new NetlinkUevent());
+  listener.add_eventsource(new NetlinkRoute());
+  listener.add_event("genesis-initialising");
+  listener.add_event("genesis-started");
 
-    while (! listener.terminate())
-    {
-        listener.process_eventqueue();
-        listener.listen();
-    }
+  while (!listener.terminate()) {
+    listener.process_eventqueue();
+    listener.listen();
+  }
 }
-

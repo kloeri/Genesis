@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright © 2010 Saleem Abdulrasool
  *
@@ -19,50 +19,44 @@
 #ifndef __SRC_GENESIS_COMMAND_LINE_HH__
 #define __SRC_GENESIS_COMMAND_LINE_HH__
 
-#include <map>
 #include <list>
+#include <map>
 #include <string>
 
-namespace genesis
-{
-    class argument;
+namespace genesis {
+class argument;
 
-    struct bad_argument
-    {
-        const std::string argument;
+struct bad_argument {
+  const std::string argument;
 
-        bad_argument(const std::string & argument)
-            : argument(argument)
-        {
-        }
-    };
+  bad_argument(const std::string &argument) : argument(argument) {}
+};
 
-    class command_line
-    {
-        friend std::ostream & operator<<(std::ostream & os, const command_line & command_line);
+class command_line {
+  friend std::ostream &operator<<(std::ostream &os,
+                                  const command_line &command_line);
 
-        private:
-            std::list<argument *> _arguments;
+private:
+  std::list<argument *> _arguments;
 
-            std::map<std::string, argument *> _long_names;
-            std::map<char, argument *> _short_names;
+  std::map<std::string, argument *> _long_names;
+  std::map<char, argument *> _short_names;
 
-            std::list<std::string> _parameters;
+  std::list<std::string> _parameters;
 
-        public:
-            command_line(void);
-            ~command_line(void);
+public:
+  command_line(void);
+  ~command_line(void);
 
-            void add_argument(argument *argument);
-            const argument * get_argument(const std::string & long_name) const;
+  void add_argument(argument *argument);
+  const argument *get_argument(const std::string &long_name) const;
 
-            void parse(const int argc, const char * const * const argv);
+  void parse(const int argc, const char *const *const argv);
 
-            const std::list<std::string> & parameters(void) const;
-    };
+  const std::list<std::string> &parameters(void) const;
+};
 
-    std::ostream & operator<<(std::ostream & os, const command_line & command_line);
+std::ostream &operator<<(std::ostream &os, const command_line &command_line);
 }
 
 #endif
-

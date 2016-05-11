@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright © 2010 Saleem Abdulrasool
  *
@@ -21,34 +21,31 @@
 
 #include <string>
 
-namespace genesis
-{
-    class argument
-    {
-        protected:
-            bool _specified;
+namespace genesis {
+class argument {
+protected:
+  bool _specified;
 
-            argument(const std::string & long_name, const char short_name, const std::string & description);
+  argument(const std::string &long_name, const char short_name,
+           const std::string &description);
 
-        public:
-            const std::string description;
-            const std::string long_name;
-            const char short_name;
+public:
+  const std::string description;
+  const std::string long_name;
+  const char short_name;
 
-            virtual ~argument(void);
+  virtual ~argument(void);
 
-            virtual void specified(const bool value);
-            virtual bool specified(void) const;
-    };
+  virtual void specified(const bool value);
+  virtual bool specified(void) const;
+};
 
-    class switched_argument
-        : public argument
-    {
-        public:
-            switched_argument(const std::string & long_name, const char short_name, const std::string & description);
-            virtual ~switched_argument(void);
-    };
+class switched_argument : public argument {
+public:
+  switched_argument(const std::string &long_name, const char short_name,
+                    const std::string &description);
+  virtual ~switched_argument(void);
+};
 }
 
 #endif
-

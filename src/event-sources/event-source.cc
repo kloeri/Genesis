@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright © 2010 Saleem Abdulrasool
  *
@@ -20,18 +20,8 @@
 
 using namespace genesis::events;
 
-EventSource::EventSource(void)
-    : _fd(-1)
-{
-}
+EventSource::EventSource(void) : _fd(-1) {}
 
-EventSource::~EventSource(void)
-{
-}
+EventSource::~EventSource(void) {}
 
-int
-EventSource::fd(void) const
-{
-    return _fd;
-}
-
+int EventSource::fd(void) const { return _fd; }

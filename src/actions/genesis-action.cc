@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 
 /*
  * Copyright (c) 2010 Bryan Østergaard
@@ -17,35 +17,27 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "genesis-action.hh"
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include "genesis-action.hh"
 
-#include "util/log.hh"
 #include "genesis-handler/event-listener.hh"
+#include "util/log.hh"
 
-#define GENESIS_ACTION          ("Genesis-Action")
+#define GENESIS_ACTION ("Genesis-Action")
 
 using namespace genesis;
 using namespace genesis::logging;
 
-void GenesisAction::Execute()
-{
-    if (command == "exit")
-    {
-        Log::get_instance().log(INFO, GENESIS_ACTION, "Genesis received exit command.");
-        EventListener::get_instance().terminate(true);
-    }
+void GenesisAction::Execute() {
+  if (command == "exit") {
+    Log::get_instance().log(INFO, GENESIS_ACTION,
+                            "Genesis received exit command.");
+    EventListener::get_instance().terminate(true);
+  }
 }
 
-std::string GenesisAction::GetResult()
-{
-    return "";
-}
+std::string GenesisAction::GetResult() { return ""; }
 
-std::string GenesisAction::Identity()
-{
-    return command;
-}
-
+std::string GenesisAction::Identity() { return command; }

@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright (c) 2010 Saleem Abdulrasool
  *
@@ -25,137 +25,87 @@
 #include <sstream>
 #include <streambuf>
 
-namespace genesis
-{
-    namespace logging
-    {
-        namespace internals
-        {
-            struct null_streambuf
-                : public std::streambuf
-            {
-                int_type
-                overflow(int_type c)
-                {
-                    return std::char_traits<char>::not_eof(c);
-                }
-            };
+namespace genesis {
+namespace logging {
+namespace internals {
+struct null_streambuf : public std::streambuf {
+  int_type overflow(int_type c) { return std::char_traits<char>::not_eof(c); }
+};
 
-            struct null_streambuf_init
-            {
-                null_streambuf _buffer;
+struct null_streambuf_init {
+  null_streambuf _buffer;
 
-                std::streambuf *
-                rdbuf(void)
-                {
-                    return &_buffer;
-                }
-            };
+  std::streambuf *rdbuf(void) { return &_buffer; }
+};
 
-            struct fstream_init
-            {
-                std::ofstream _stream;
+struct fstream_init {
+  std::ofstream _stream;
 
-                fstream_init(const std::string & path, std::ios_base::openmode mode = std::ios_base::out)
-                    : _stream(path, mode)
-                {
-                }
+  fstream_init(const std::string &path,
+               std::ios_base::openmode mode = std::ios_base::out)
+      : _stream(path, mode) {}
 
-                std::streambuf *
-                rdbuf(void)
-                {
-                    return _stream.rdbuf();
-                }
-            };
+  std::streambuf *rdbuf(void) { return _stream.rdbuf(); }
+};
 
-            struct syslog_streambuf
-                : public std::streambuf
-            {
-                std::ostringstream _buffer;
-                typedef std::char_traits<char> traits;
+struct syslog_streambuf : public std::streambuf {
+  std::ostringstream _buffer;
+  typedef std::char_traits<char> traits;
 
-                int_type
-                overflow(int_type c)
-                {
-                    if (! traits::eq_int_type(c, traits::eof()))
-                        _buffer << traits::to_char_type(c);
-                    return traits::not_eof(c);
-                }
+  int_type overflow(int_type c) {
+    if (!traits::eq_int_type(c, traits::eof()))
+      _buffer << traits::to_char_type(c);
+    return traits::not_eof(c);
+  }
 
-                int
-                sync(void)
-                {
-                    ::syslog(0, "%s", _buffer.str().c_str());
-                    _buffer.str("");
-                    return 0;
-                }
-            };
+  int sync(void) {
+    ::syslog(0, "%s", _buffer.str().c_str());
+    _buffer.str("");
+    return 0;
+  }
+};
 
-            struct syslog_streambuf_init
-            {
-                syslog_streambuf _buffer;
+struct syslog_streambuf_init {
+  syslog_streambuf _buffer;
 
-                std::streambuf *
-                rdbuf(void)
-                {
-                    return &_buffer;
-                }
-            };
-        }
+  std::streambuf *rdbuf(void) { return &_buffer; }
+};
+}
 
-        class null_stream
-            : private virtual internals::null_streambuf_init,
-              public std::ostream
-        {
-            private:
-                typedef null_streambuf_init buffer;
+class null_stream : private virtual internals::null_streambuf_init,
+                    public std::ostream {
+private:
+  typedef null_streambuf_init buffer;
 
-            public:
-                null_stream(void)
-                    : std::ostream(buffer::rdbuf())
-                {
-                }
-        };
+public:
+  null_stream(void) : std::ostream(buffer::rdbuf()) {}
+};
 
-        class console_stream
-            : public std::ostream
-        {
-            public:
-                console_stream(void)
-                    : std::ostream(std::clog.rdbuf())
-                {
-                }
-        };
+class console_stream : public std::ostream {
+public:
+  console_stream(void) : std::ostream(std::clog.rdbuf()) {}
+};
 
-        class file_stream
-            : private virtual internals::fstream_init,
-              public std::ostream
-        {
-            private:
-                typedef fstream_init buffer;
+class file_stream : private virtual internals::fstream_init,
+                    public std::ostream {
+private:
+  typedef fstream_init buffer;
 
-            public:
-                file_stream(const std::string & path, std::ios_base::openmode mode = std::ios_base::out)
-                    : fstream_init(path, mode), std::ostream(buffer::rdbuf())
-                {
-                }
-        };
+public:
+  file_stream(const std::string &path,
+              std::ios_base::openmode mode = std::ios_base::out)
+      : fstream_init(path, mode), std::ostream(buffer::rdbuf()) {}
+};
 
-        class syslog_stream
-            : private virtual internals::syslog_streambuf_init,
-              public std::ostream
-        {
-            private:
-                typedef syslog_streambuf_init buffer;
+class syslog_stream : private virtual internals::syslog_streambuf_init,
+                      public std::ostream {
+private:
+  typedef syslog_streambuf_init buffer;
 
-            public:
-                syslog_stream(void)
-                    : std::ostream(buffer::rdbuf())
-                {
-                }
-        };
-    }
+public:
+  syslog_stream(void) : std::ostream(buffer::rdbuf()) {}
+};
+}
 }
 
 #endif
-

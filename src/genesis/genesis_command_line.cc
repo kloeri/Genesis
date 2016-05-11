@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright © 2010 Saleem Abdulrasool
  *
@@ -23,13 +23,9 @@ using namespace genesis;
 
 genesis_command_line::genesis_command_line(void)
     : help("help", 'h', "display help message"),
-      terminate("terminate", 't', "stop genesis-handler")
-{
-    add_argument(&help);
-    add_argument(&terminate);
+      terminate("terminate", 't', "stop genesis-handler") {
+  add_argument(&help);
+  add_argument(&terminate);
 }
 
-genesis_command_line::~genesis_command_line(void)
-{
-}
-
+genesis_command_line::~genesis_command_line(void) {}

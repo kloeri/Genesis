@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright (c) 2010 Bryan Østergaard
  *
@@ -19,45 +19,40 @@
 #ifndef SRC_UTIL_LOG_HH
 #define SRC_UTIL_LOG_HH
 
+#include <iostream>
 #include <memory>
 #include <ostream>
-#include <iostream>
 
-#include "util/singleton.hh"
 #include "util/log-destinations.hh"
+#include "util/singleton.hh"
 
-namespace genesis
-{
-    namespace logging
-    {
-        enum LogLevel
-        {
-            DEBUG,
-            INFO,
-            NOTICE,
-            WARN,
-            CRIT,
-            ERR,
-        };
+namespace genesis {
+namespace logging {
+enum LogLevel {
+  DEBUG,
+  INFO,
+  NOTICE,
+  WARN,
+  CRIT,
+  ERR,
+};
 
-        class Log
-            : public Singleton<Log>
-        {
-            private:
-                std::unique_ptr<std::ostream> _dest;
-                LogLevel _minimum_log_level;
+class Log : public Singleton<Log> {
+private:
+  std::unique_ptr<std::ostream> _dest;
+  LogLevel _minimum_log_level;
 
-            public:
-                Log(std::unique_ptr<std::ostream> dest = std::unique_ptr<std::ostream>(new console_stream));
+public:
+  Log(std::unique_ptr<std::ostream> dest =
+          std::unique_ptr<std::ostream>(new console_stream));
 
-                void set_minimum_log_level(const LogLevel level);
-                void log(const LogLevel level, const std::string & tag, const std::string & message);
-        };
+  void set_minimum_log_level(const LogLevel level);
+  void log(const LogLevel level, const std::string &tag,
+           const std::string &message);
+};
 
-        std::ostream &
-        operator<<(std::ostream & os, const LogLevel level);
-    }
+std::ostream &operator<<(std::ostream &os, const LogLevel level);
+}
 }
 
 #endif
-

@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright © 2010 Bryan Østergaard
  *
@@ -22,14 +22,11 @@
 #include <string>
 #include <vector>
 
-namespace genesis
-{
-    namespace util
-    {
-        std::vector<std::string>
-        tokenise(const std::string & string, const std::string & delimiter = " ");
-    }
+namespace genesis {
+namespace util {
+std::vector<std::string> tokenise(const std::string &string,
+                                  const std::string &delimiter = " ");
+}
 }
 
 #endif
-

@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright (c) 2010 Bryan Østergaard
  *
@@ -19,40 +19,36 @@
 #ifndef SRC_GENESIS_HANDLER_EVENT_LISTENER_HH
 #define SRC_GENESIS_HANDLER_EVENT_LISTENER_HH
 
-#include <map>
 #include <list>
+#include <map>
 #include <string>
 
-#include "util/singleton.hh"
-#include "event-sources/event.hh"
 #include "event-sources/event-source.hh"
+#include "event-sources/event.hh"
+#include "util/singleton.hh"
 
-namespace genesis
-{
-    class EventListener
-        : public Singleton<EventListener>
-    {
-        private:
-            bool _terminate;
-            std::map<int, EventManager *> _managers;
-            std::map<int, genesis::events::EventSource *> _sources;
-            std::list<std::string> _events;
+namespace genesis {
+class EventListener : public Singleton<EventListener> {
+private:
+  bool _terminate;
+  std::map<int, EventManager *> _managers;
+  std::map<int, genesis::events::EventSource *> _sources;
+  std::list<std::string> _events;
 
-        public:
-            EventListener(void);
-            ~EventListener(void);
+public:
+  EventListener(void);
+  ~EventListener(void);
 
-            void add_source(genesis::events::EventSource *source);
+  void add_source(genesis::events::EventSource *source);
 
-            void add_eventsource(EventManager *manager);
-            void add_event(const std::string & event);
-            void listen(void);
-            void process_eventqueue(void);
+  void add_eventsource(EventManager *manager);
+  void add_event(const std::string &event);
+  void listen(void);
+  void process_eventqueue(void);
 
-            bool terminate(void) const;
-            void terminate(const bool terminate);
-    };
+  bool terminate(void) const;
+  void terminate(const bool terminate);
+};
 }
 
 #endif
-

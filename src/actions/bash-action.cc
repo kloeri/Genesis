@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 
 /*
  * Copyright (c) 2010 Bryan Østergaard
@@ -23,28 +23,19 @@
 #include "actions/bash-action.hh"
 #include "genesis-handler/bash.hh"
 
-void BashAction::Execute()
-{
-    if (_command == "get-metadata")
-    {
-        _result = GetMetadata(_script);
-    }
-    if (_command == "run-function")
-    {
-        _result = RunBashFunction(_script, _function, _env);
-    }
+void BashAction::Execute() {
+  if (_command == "get-metadata") {
+    _result = GetMetadata(_script);
+  }
+  if (_command == "run-function") {
+    _result = RunBashFunction(_script, _function, _env);
+  }
 }
 
-std::string BashAction::GetResult()
-{
-    return _result;
+std::string BashAction::GetResult() { return _result; }
+
+std::string BashAction::Identity() {
+  return _command + ": " + _script + "->" + _function;
 }
 
-std::string BashAction::Identity()
-{
-    return _command + ": " + _script + "->" + _function;
-}
-
-BashAction::~BashAction()
-{
-}
+BashAction::~BashAction() {}

@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright © 2010 Bryan Østergaard
  *
@@ -23,24 +23,19 @@
 
 #include "event-sources/event-source.hh"
 
-namespace genesis
-{
-    namespace events
-    {
-        class GenesisPipe
-            : public EventSource
-        {
-            public:
-                static const std::string Name;
+namespace genesis {
+namespace events {
+class GenesisPipe : public EventSource {
+public:
+  static const std::string Name;
 
-                GenesisPipe(void);
-                ~GenesisPipe(void);
+  GenesisPipe(void);
+  ~GenesisPipe(void);
 
-                virtual std::unique_ptr<Action> process_event(void);
-                virtual void event_processed(const std::string & event);
-        };
-    }
+  virtual std::unique_ptr<Action> process_event(void);
+  virtual void event_processed(const std::string &event);
+};
+}
 }
 
 #endif
-

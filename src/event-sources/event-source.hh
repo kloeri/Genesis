@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright © 2010 Saleem Abdulrasool
  *
@@ -23,27 +23,23 @@
 
 #include "actions/action.hh"
 
-namespace genesis
-{
-    namespace events
-    {
-        class EventSource
-        {
-            protected:
-                int _fd;
+namespace genesis {
+namespace events {
+class EventSource {
+protected:
+  int _fd;
 
-                EventSource(void);
+  EventSource(void);
 
-            public:
-                virtual ~EventSource(void);
+public:
+  virtual ~EventSource(void);
 
-                virtual int fd(void) const;
+  virtual int fd(void) const;
 
-                virtual std::unique_ptr<Action> process_event(void) = 0;
-                virtual void event_processed(const std::string & event) = 0;
-        };
-    }
+  virtual std::unique_ptr<Action> process_event(void) = 0;
+  virtual void event_processed(const std::string &event) = 0;
+};
+}
 }
 
 #endif
-

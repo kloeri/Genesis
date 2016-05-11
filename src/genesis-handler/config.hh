@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 
 /*
  * Copyright (c) 2010 Bryan Østergaard
@@ -23,17 +23,18 @@
 #include <map>
 #include <string>
 
-class Configuration
-{
-    private:
-        std::string section;
-        mutable std::map<std::string, std::string> options;
+class Configuration {
+private:
+  std::string section;
+  mutable std::map<std::string, std::string> options;
 
-    public:
-        Configuration(std::string conffile, std::string modulename);
-        Configuration(std::string conffile, std::string modulename, std::map<std::string, std::string> defaultconfiguration);
-        void Construct(std::string conffile, std::string modulename, std::map<std::string, std::string> defaultconfiguration);
-        std::string get_option(const std::string key) const;
+public:
+  Configuration(std::string conffile, std::string modulename);
+  Configuration(std::string conffile, std::string modulename,
+                std::map<std::string, std::string> defaultconfiguration);
+  void Construct(std::string conffile, std::string modulename,
+                 std::map<std::string, std::string> defaultconfiguration);
+  std::string get_option(const std::string key) const;
 };
 
 #endif

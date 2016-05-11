@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright © 2010 Saleem Abdulrasool
  *
@@ -19,22 +19,18 @@
 #ifndef __SRC_GENESIS_GENESIS_COMMAND_LINE_HH__
 #define __SRC_GENESIS_GENESIS_COMMAND_LINE_HH__
 
-#include "genesis/command_line.hh"
 #include "genesis/argument.hh"
+#include "genesis/command_line.hh"
 
-namespace genesis
-{
-    class genesis_command_line
-        : public command_line
-    {
-        public:
-            genesis::switched_argument help;
-            genesis::switched_argument terminate;
+namespace genesis {
+class genesis_command_line : public command_line {
+public:
+  genesis::switched_argument help;
+  genesis::switched_argument terminate;
 
-            genesis_command_line(void);
-            virtual ~genesis_command_line(void);
-    };
+  genesis_command_line(void);
+  virtual ~genesis_command_line(void);
+};
 };
 
 #endif
-

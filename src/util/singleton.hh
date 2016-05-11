@@ -1,4 +1,4 @@
-/* vim: set et fdm=syntax sts=4 sw=4 : */
+/* vim: set et fdm=syntax sts=2 sw=2 : */
 /*
  * Copyright © 2000 Scott Bilas
  *
@@ -21,34 +21,27 @@
 
 #include <cassert>
 
-template <typename type_>
-class Singleton
-{
-    private:
-        static type_ *_instance;
+template <typename type_> class Singleton {
+private:
+  static type_ *_instance;
 
-    public:
-        Singleton(void)
-        {
-            assert(! _instance);
-            _instance = static_cast<type_ *>(this);
-        }
+public:
+  Singleton(void) {
+    assert(!_instance);
+    _instance = static_cast<type_ *>(this);
+  }
 
-        virtual ~Singleton(void)
-        {
-            assert(_instance);
-            _instance = NULL;
-        }
+  virtual ~Singleton(void) {
+    assert(_instance);
+    _instance = NULL;
+  }
 
-        static type_ & get_instance(void)
-        {
-            assert(_instance);
-            return *_instance;
-        }
+  static type_ &get_instance(void) {
+    assert(_instance);
+    return *_instance;
+  }
 };
 
-template <typename type_>
-type_ * Singleton<type_>::_instance = NULL;
+template <typename type_> type_ *Singleton<type_>::_instance = NULL;
 
 #endif
-

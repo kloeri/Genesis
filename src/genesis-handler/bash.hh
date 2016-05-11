@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 
 /*
  * Copyright (c) 2010 Bryan Østergaard
@@ -23,12 +23,14 @@
 #include <string>
 #include <vector>
 
-char **charptrarray(const std::vector<std::string> & env);
+char **charptrarray(const std::vector<std::string> &env);
 
 // Sources file and returns SUBSCRIPTION_* variables from it
-std::string GetMetadata(const std::string & file);
+std::string GetMetadata(const std::string &file);
 
 // Runs specified function with predetermined environment
-std::string RunBashFunction(const std::string & file, const std::string & function, const std::vector<std::string> & envvars);
+std::string RunBashFunction(const std::string &file,
+                            const std::string &function,
+                            const std::vector<std::string> &envvars);
 
 #endif

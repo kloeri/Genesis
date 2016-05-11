@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 
 /*
  * Copyright (c) 2010 Bryan Østergaard
@@ -20,43 +20,44 @@
 #ifndef EVENTS_GUARD_NETLINK_UEVENT_HH
 #define EVENTS_GUARD_NETLINK_UEVENT_HH 1
 
+#include "genesis-handler/config.hh"
+#include <event-sources/event.hh>
 #include <list>
 #include <utility>
-#include <event-sources/event.hh>
-#include "genesis-handler/config.hh"
 
-class NetlinkUevent : public EventManager
-{
-    private:
-        Configuration * UEventConfiguration;
-        std::list<eventhandler> eventsubscriptions;
-        int netlinksocket;
+class NetlinkUevent : public EventManager {
+private:
+  Configuration *UEventConfiguration;
+  std::list<eventhandler> eventsubscriptions;
+  int netlinksocket;
 
-        // Generate a list of coldplug events
-        void GenerateEvents();
+  // Generate a list of coldplug events
+  void GenerateEvents();
 
-        // Actual method responsible for the netlink uevent socket setup
-        void * OpenSocket(int domain, int type, int protocol, int multicastgroup);
+  // Actual method responsible for the netlink uevent socket setup
+  void *OpenSocket(int domain, int type, int protocol, int multicastgroup);
 
-        // Iterates over netlink-uevent scripts and gathers SUBSCRIPTION_* metadata
-        void SourceScripts(std::string path);
+  // Iterates over netlink-uevent scripts and gathers SUBSCRIPTION_* metadata
+  void SourceScripts(std::string path);
 
-    public:
-        // Sets up default configuration, does coldplugging if wanted and sets up the netlink uevent socket
-        NetlinkUevent();
-        ~NetlinkUevent();
+public:
+  // Sets up default configuration, does coldplugging if wanted and sets up the
+  // netlink uevent socket
+  NetlinkUevent();
+  ~NetlinkUevent();
 
-        // Return all queued events (think coldplugging) and clear the internal queue
-        std::list<std::string> get_events();
+  // Return all queued events (think coldplugging) and clear the internal queue
+  std::list<std::string> get_events();
 
-        // Handles raw events, matching them to subscriptions and sending Actions to genesis proper as needed
-        Action * ProcessEvent(std::string event);
+  // Handles raw events, matching them to subscriptions and sending Actions to
+  // genesis proper as needed
+  Action *ProcessEvent(std::string event);
 
-        // Listens for netlink uevent messages and sends raw events to ProcessEvent
-        Action * GetEvent();
+  // Listens for netlink uevent messages and sends raw events to ProcessEvent
+  Action *GetEvent();
 
-        int get_fd();
-        Action * new_event(std::string event);
+  int get_fd();
+  Action *new_event(std::string event);
 };
 
 #endif

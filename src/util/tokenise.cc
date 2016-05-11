@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright © 2010 Saleem Abdulrasool
  *
@@ -20,22 +20,19 @@
 
 using namespace genesis::util;
 
-std::vector<std::string>
-genesis::util::tokenise(const std::string & string, const std::string & delimiter)
-{
-    std::vector<std::string> tokens;
-    std::string::size_type start, end;
+std::vector<std::string> genesis::util::tokenise(const std::string &string,
+                                                 const std::string &delimiter) {
+  std::vector<std::string> tokens;
+  std::string::size_type start, end;
 
-    start = string.find_first_not_of(delimiter, 0);
+  start = string.find_first_not_of(delimiter, 0);
+  end = string.find_first_of(delimiter, start);
+
+  while (end != std::string::npos || start != std::string::npos) {
+    tokens.push_back(string.substr(start, end - start));
+    start = string.find_first_not_of(delimiter, end);
     end = string.find_first_of(delimiter, start);
+  }
 
-    while (end != std::string::npos || start != std::string::npos)
-    {
-        tokens.push_back(string.substr(start, end - start));
-        start = string.find_first_not_of(delimiter, end);
-        end = string.find_first_of(delimiter, start);
-    }
-
-    return tokens;
+  return tokens;
 }
-

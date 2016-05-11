@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright © 2010 Saleem Abdulrasool
  *
@@ -20,33 +20,20 @@
 
 using namespace genesis;
 
-argument::argument(const std::string & long_name, const char short_name, const std::string & description)
-    : _specified(false), description(description), long_name(long_name), short_name(short_name)
-{
-}
+argument::argument(const std::string &long_name, const char short_name,
+                   const std::string &description)
+    : _specified(false), description(description), long_name(long_name),
+      short_name(short_name) {}
 
-argument::~argument(void)
-{
-}
+argument::~argument(void) {}
 
-void
-argument::specified(const bool value)
-{
-    _specified = value;
-}
+void argument::specified(const bool value) { _specified = value; }
 
-bool
-argument::specified(void) const
-{
-    return _specified;
-}
+bool argument::specified(void) const { return _specified; }
 
-switched_argument::switched_argument(const std::string & long_name, const char short_name, const std::string & description)
-    : argument(long_name, short_name, description)
-{
-}
+switched_argument::switched_argument(const std::string &long_name,
+                                     const char short_name,
+                                     const std::string &description)
+    : argument(long_name, short_name, description) {}
 
-switched_argument::~switched_argument(void)
-{
-}
-
+switched_argument::~switched_argument(void) {}

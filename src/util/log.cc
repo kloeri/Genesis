@@ -1,4 +1,4 @@
-/* vim: set sw=4 sts=4 et foldmethod=syntax : */
+/* vim: set sw=2 sts=2 et foldmethod=syntax : */
 /*
  * Copyright (c) 2010 Bryan Østergaard
  *
@@ -21,41 +21,33 @@
 using namespace genesis::logging;
 
 Log::Log(std::unique_ptr<std::ostream> dest)
-    : _dest(std::move(dest)), _minimum_log_level(ERR)
-{
+    : _dest(std::move(dest)), _minimum_log_level(ERR) {}
+
+void Log::set_minimum_log_level(const LogLevel level) {
+  _minimum_log_level = level;
 }
 
-void
-Log::set_minimum_log_level(const LogLevel level)
-{
-    _minimum_log_level = level;
+void Log::log(const LogLevel level, const std::string &tag,
+              const std::string &message) {
+  (*_dest) << level << tag << ": " << message << std::endl;
 }
 
-void
-Log::log(const LogLevel level, const std::string & tag, const std::string & message)
-{
-    (*_dest) << level << tag << ": " << message << std::endl;
+std::ostream &genesis::logging::operator<<(std::ostream &os,
+                                           const LogLevel level) {
+  switch (level) {
+  case DEBUG:
+    return os << "debug: ";
+  case INFO:
+    return os << "info: ";
+  case NOTICE:
+    return os << "notice: ";
+  case WARN:
+    return os << "warn: ";
+  case ERR:
+    return os << "error: ";
+  case CRIT:
+    return os << "critical: ";
+  }
+
+  return os;
 }
-
-std::ostream &
-genesis::logging::operator<<(std::ostream & os, const LogLevel level)
-{
-    switch (level)
-    {
-        case DEBUG:
-            return os << "debug: ";
-        case INFO:
-            return os << "info: ";
-        case NOTICE:
-            return os << "notice: ";
-        case WARN:
-            return os << "warn: ";
-        case ERR:
-            return os << "error: ";
-        case CRIT:
-            return os << "critical: ";
-    }
-
-    return os;
-}
-
