@@ -28,6 +28,8 @@ AC_SEARCH_LIBS([mnl_socket_open], [mnl], [], [
     AC_MSG_ERROR([unable to find the mnl_socket_open() function])
     ])
 
+AC_CHECK_HEADERS_ONCE(libmnl/libmnl.h)
+
 AM_SILENT_RULES([no])
 AC_CONFIG_FILES([
    Makefile
