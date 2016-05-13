@@ -38,7 +38,30 @@ int main(int argc, char *argv[]) {
   std::cout << "Genesis (c) 2010 Bryan Østergaard <kloeri@exherbo.org>"
             << std::endl;
 
-  log.set_minimum_log_level(DEBUG);
+  Configuration *GenesisConfiguration;
+  std::map<std::string, std::string> defaultconfig;
+  defaultconfig["loglevel"] = "debug";
+
+  GenesisConfiguration =
+      new Configuration(SYSCONFDIR "genesis.conf", "genesis", defaultconfig);
+  if (GenesisConfiguration->get_option("loglevel") == "debug") {
+    log.set_minimum_log_level(DEBUG);
+  }
+  if (GenesisConfiguration->get_option("loglevel") == "info") {
+    log.set_minimum_log_level(INFO);
+  }
+  if (GenesisConfiguration->get_option("loglevel") == "notice") {
+    log.set_minimum_log_level(NOTICE);
+  }
+  if (GenesisConfiguration->get_option("loglevel") == "warn") {
+    log.set_minimum_log_level(WARN);
+  }
+  if (GenesisConfiguration->get_option("loglevel") == "crit") {
+    log.set_minimum_log_level(CRIT);
+  }
+  if (GenesisConfiguration->get_option("loglevel") == "err") {
+    log.set_minimum_log_level(ERR);
+  }
 
   listener.add_source(new GenesisPipe);
 
