@@ -67,8 +67,8 @@ int main(int argc, char *argv[]) {
 
   listener.add_eventsource(new NetlinkUevent());
   listener.add_eventsource(new NetlinkRoute());
-  listener.add_event("genesis-initialising");
-  listener.add_event("genesis-started");
+  //listener.add_event("genesis-initialising");
+  //listener.add_event("genesis-started");
 
   while (!listener.terminate()) {
     listener.process_eventqueue();
