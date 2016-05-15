@@ -2,7 +2,6 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-#AM_CPPFLAGS = -Werror -Wall                           \
 AM_CPPFLAGS = -Wall                                   \
 	      -I $(top_srcdir)/src                    \
 	      -DSYSCONFDIR=\"${sysconfdir}/genesis/\" \
