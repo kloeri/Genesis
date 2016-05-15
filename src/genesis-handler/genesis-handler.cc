@@ -26,6 +26,7 @@
 
 #include "event-sources/genesis-pipe.hh"
 #include "genesis-handler/event-listener.hh"
+//#include "jobs/jobs.hh"
 
 using namespace genesis;
 using namespace genesis::events;
@@ -38,6 +39,7 @@ int main(int argc, char *argv[]) {
   std::cout << "Genesis (c) 2010 Bryan Østergaard <kloeri@exherbo.org>"
             << std::endl;
 
+  // Main configuration
   Configuration *GenesisConfiguration;
   std::map<std::string, std::string> defaultconfig;
   defaultconfig["loglevel"] = "debug";
@@ -62,6 +64,11 @@ int main(int argc, char *argv[]) {
   if (GenesisConfiguration->get_option("loglevel") == "err") {
     log.set_minimum_log_level(ERR);
   }
+
+  // Jobs configuration
+//  JobsConfiguration *Jobs;
+//
+//  Jobs = new JobsConfiguration(SYSCONFDIR "jobs.conf");
 
   listener.add_source(new GenesisPipe);
 
