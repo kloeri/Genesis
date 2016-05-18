@@ -77,7 +77,7 @@ src_genesis_handler_genesis_handler_SOURCES = src/genesis-handler/bash.cc       
 
 src_genesis_handler_genesis_handler_CXXFLAGS = $(PCREPLUSPLUS_CFLAGS)
 src_genesis_handler_genesis_handler_LDFLAGS = $(PCREPLUSPLUS_LIBS)
-src_genesis_handler_genesis_handler_LDADD = src/util/libutil.la src/event-sources/libevent-sources.la
+src_genesis_handler_genesis_handler_LDADD = src/util/libutil.la src/event-sources/libevent-sources.la src/jobs/libjobs.la
 
 src_genesis_genesis_SOURCES = src/genesis/argument.cc             \
 			      src/genesis/argument.hh             \
