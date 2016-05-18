@@ -20,18 +20,27 @@
 #ifndef SRC_GENESIS_HANDLER_GUARD_JOBS_HH
 #define SRC_GENESIS_HANDLER_GUARD_JOBS_HH 1
 
+#include <list>
 #include <map>
 #include <string>
 
 class JobsConfiguration {
 private:
   std::string section;
-  mutable std::map<std::string, std::string> options;
+  std::map<std::string, std::string> options;
+  struct job {
+    job(std::string n, std::string m, std::string a) : name(n), match(m), action(a) {}
+    std::string name;
+    std::string match;
+    std::string action;
+  };
+  std::list<job> jobs;
 
 public:
   JobsConfiguration(std::string conffile);
   void Construct(std::string conffile);
   std::string get_option(const std::string key) const;
+  void show_all();
 };
 
 #endif

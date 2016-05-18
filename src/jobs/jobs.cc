@@ -19,9 +19,17 @@
 
 #include <fstream>
 #include <iostream>
-#include <pcre++.h>
+#include <regex>
 
 #include "jobs/jobs.hh"
+
+namespace {
+  bool non_empty(std::string name, std::string match, std::string action) {
+    if (name == "" || match == "" || action == "")
+      return false;
+    return true;
+  }
+}
 
 JobsConfiguration::JobsConfiguration(std::string conffile) {
   Construct(conffile);
@@ -29,40 +37,57 @@ JobsConfiguration::JobsConfiguration(std::string conffile) {
 
 void JobsConfiguration::Construct(std::string conffile) {
   std::ifstream config(conffile.c_str());
-  std::string section("foobar");
-  std::string sectionname("foobar");
+
+  std::string jobname;
+  std::string matching;
+  std::string action;
+
+  std::regex regex_jobname("\\[[a-zA-Z][a-zA-Z0-9]*\\]");
+  std::regex regex_comment("#.*");
+  std::regex regex_matching("match=[a-zA-Z]+:.+");
+  std::regex regex_action("action=(bash|python):.+");
 
   if (config) {
     while (!config.eof()) {
       std::string line;
       std::getline(config, line);
 
+      if (non_empty(jobname, matching, action)) {
+        jobs.push_back(job(jobname, matching, action));
+
+        jobname = "";
+        matching = "";
+        action = "";
+      }
+
       // Remove comments
-      pcrepp::Pcre regex_comments("#.*");
-      line = regex_comments.replace(line, "");
+      if (std::regex_match(line.begin(), line.end(), regex_comment)) {
+        continue;
+      }
 
-      if (section == sectionname) {
-        pcrepp::Pcre regex_module("[ \t]*\\[([a-zA-Z]+)\\][ \t]*");
-        regex_module.search(line);
-        if (regex_module.matches() > -1) {
-          section = regex_module.get_match(0);
-        }
-
-        pcrepp::Pcre regex_keyvalue(
-            "[ \t]*([a-zA-Z_-]+)[ \t]*=[ \t]*([a-zA-Z0-9/._]+)[ \t]*");
-        regex_keyvalue.search(line);
-        if (regex_keyvalue.matches() > -1) {
-          options[regex_keyvalue.get_match(0)] = regex_keyvalue.get_match(1);
-        }
-      } else if (line[0] == '[') {
-        section = line.substr(1, line.size() - 2);
+      if (std::regex_match(line.begin(), line.end(), regex_jobname)) {
+        jobname = line.substr(1, line.size() - 2);
+        matching = "";
+        continue;
+      }
+      if (std::regex_match(line.begin(), line.end(), regex_matching)) {
+        matching = line.substr(6, line.size() - 6);
+        continue;
+      }
+      if (std::regex_match(line.begin(), line.end(), regex_action)) {
+        action = line.substr(7, line.size() - 7);
+        continue;
       }
     }
   }
-
-  section = sectionname;
 }
 
 std::string JobsConfiguration::get_option(const std::string key) const {
-  return options[key];
+  return nullptr;
+}
+
+void JobsConfiguration::show_all() {
+  for (auto j : jobs) {
+    std::cout << "job: " << j.name << ", " << j.match << ", " << j.action << std::endl;
+  }
 }
