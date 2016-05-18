@@ -82,10 +82,6 @@ void JobsConfiguration::Construct(std::string conffile) {
   }
 }
 
-std::string JobsConfiguration::get_option(const std::string key) const {
-  return nullptr;
-}
-
 void JobsConfiguration::show_all() {
   for (auto j : jobs) {
     std::cout << "job: " << j.name << ", " << j.match << ", " << j.action << std::endl;
