@@ -26,7 +26,7 @@
 
 #include "event-sources/genesis-pipe.hh"
 #include "genesis-handler/event-listener.hh"
-//#include "jobs/jobs.hh"
+#include "jobs/jobs.hh"
 
 using namespace genesis;
 using namespace genesis::events;
@@ -66,9 +66,10 @@ int main(int argc, char *argv[]) {
   }
 
   // Jobs configuration
-//  JobsConfiguration *Jobs;
-//
-//  Jobs = new JobsConfiguration(SYSCONFDIR "jobs.conf");
+  JobsConfiguration *Jobs;
+
+  Jobs = new JobsConfiguration(SYSCONFDIR "jobs.conf");
+  Jobs->show_all();
 
   listener.add_source(new GenesisPipe);
 
